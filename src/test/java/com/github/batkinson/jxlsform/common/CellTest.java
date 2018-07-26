@@ -1,5 +1,8 @@
 package com.github.batkinson.jxlsform.common;
 
+import com.github.batkinson.jxlsform.api.Row;
+import com.github.batkinson.jxlsform.api.Sheet;
+import com.github.batkinson.jxlsform.api.XLSFormException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -7,18 +10,19 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.when;
 
 public class CellTest {
 
     @Mock
-    com.github.batkinson.jxlsform.api.Row mockRow, mockHeader;
+    private Row mockRow, mockHeader;
 
     @Mock
-    com.github.batkinson.jxlsform.api.Sheet mockSheet;
+    private Sheet mockSheet;
 
     @Mock
-    com.github.batkinson.jxlsform.api.Cell mockCell;
+    private com.github.batkinson.jxlsform.api.Cell mockCell;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -38,17 +42,25 @@ public class CellTest {
 
     @Test
     public void getName() {
+        Cell c = new Cell(cellNum, type, value);
         when(mockRow.getSheet()).thenReturn(mockSheet);
         when(mockSheet.getHeader()).thenReturn(mockHeader);
         when(mockHeader.getCell(cellNum)).thenReturn(mockCell);
         when(mockCell.toString()).thenReturn(name);
-        Cell c = new Cell(cellNum, type, value);
         c.setRow(mockRow);
         assertEquals(name, c.getName());
     }
 
+    @Test(expected = XLSFormException.class)
+    public void getRowBeforeSet() {
+        Cell c = new Cell(cellNum, type, value);
+        c.getRow();
+    }
+
     @Test
     public void getRow() {
-
+        Cell c = new Cell(cellNum, type, value);
+        c.setRow(mockRow);
+        assertSame(mockRow, c.getRow());
     }
 }

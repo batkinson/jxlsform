@@ -2,6 +2,7 @@ package com.github.batkinson.jxlsform.poi;
 
 import com.github.batkinson.jxlsform.api.XLSForm;
 import com.github.batkinson.jxlsform.api.XLSFormException;
+import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 
@@ -30,7 +31,7 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
                 sheets.add(new com.github.batkinson.jxlsform.common.Sheet(sheet.getSheetName(), rows));
             }
             return new com.github.batkinson.jxlsform.common.XLSForm(sheets);
-        } catch (IOException | InvalidFormatException e) {
+        } catch (IOException | EmptyFileException | InvalidFormatException e) {
             throw new XLSFormException("failed to create workbook from stream", e);
         }
     }

@@ -1,8 +1,10 @@
 package com.github.batkinson.jxlsform.poi;
 
 import com.github.batkinson.jxlsform.api.XLSForm;
+import com.github.batkinson.jxlsform.api.XLSFormException;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,6 +13,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class XLSFormTest {
+
+    @Test(expected = XLSFormException.class)
+    public void createWithBadStream() {
+        new XLSFormFactory().create(new ByteArrayInputStream(new byte[]{}));
+    }
 
     @Test
     public void testSimpleXls() throws IOException {

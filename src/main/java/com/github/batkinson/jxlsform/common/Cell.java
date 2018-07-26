@@ -1,6 +1,7 @@
 package com.github.batkinson.jxlsform.common;
 
 import com.github.batkinson.jxlsform.api.Row;
+import com.github.batkinson.jxlsform.api.XLSFormException;
 
 public class Cell implements com.github.batkinson.jxlsform.api.Cell {
 
@@ -22,7 +23,10 @@ public class Cell implements com.github.batkinson.jxlsform.api.Cell {
 
     @Override
     public Row getRow() {
-        return null;
+        if (row == null) {
+            throw new XLSFormException("cell not associated with row");
+        }
+        return row;
     }
 
     @Override
