@@ -14,37 +14,49 @@ public class XLSFormTest {
 
     @Test
     public void testSimpleXls() throws IOException {
-        assertMinimalSheets(loadTestForm("simplest.xls"));
+        assertMinimal(form("simplest.xls"));
     }
 
     @Test
     public void testSimpleXlsx() throws IOException {
-        assertMinimalSheets(loadTestForm("simplest.xlsx"));
+        assertMinimal(form("simplest.xlsx"));
     }
 
     @Test
     public void testAllSheetsXls() throws IOException {
-        assertAllSheets(loadTestForm("allsheets.xls"));
+        assertAllSheets(form("allsheets.xls"));
     }
 
     @Test
     public void testAllSheetsXlsx() throws IOException {
-        assertAllSheets(loadTestForm("allsheets.xlsx"));
+        assertAllSheets(form("allsheets.xlsx"));
     }
 
-    private void assertMinimalSheets(XLSForm form) {
+    private void assertMinimal(XLSForm form) {
         assertNotNull(form.getSurvey());
         assertNotNull(form.getChoices());
         assertFalse(form.hasSheet(SETTINGS));
+        assertMinimalHeaders(form);
     }
 
     private void assertAllSheets(XLSForm form) {
         assertNotNull(form.getSurvey());
         assertNotNull(form.getChoices());
         assertNotNull(form.getSettings());
+        assertAllHeaders(form);
     }
 
-    private XLSForm loadTestForm(String fileName) throws IOException {
+    private void assertMinimalHeaders(XLSForm form) {
+        assertNotNull(form.getSurvey().getHeader());
+        assertNotNull(form.getChoices().getHeader());
+    }
+
+    private void assertAllHeaders(XLSForm form) {
+        assertMinimalHeaders(form);
+        assertNotNull(form.getSettings().getHeader());
+    }
+
+    private XLSForm form(String fileName) throws IOException {
         String dir = fileName.endsWith(".xls") ? "/xls" : "/xlsx";
         try (InputStream stream = XLSFormTest.class.getResourceAsStream(String.join("/", dir, fileName))) {
             return new XLSFormFactory().create(stream);
