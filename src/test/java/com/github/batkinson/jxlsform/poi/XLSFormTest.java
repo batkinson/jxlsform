@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.github.batkinson.jxlsform.api.XLSForm.SETTINGS;
+import static com.github.batkinson.jxlsform.api.XLSForm.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
@@ -36,6 +36,7 @@ public class XLSFormTest {
         assertNotNull(form.getSurvey());
         assertNotNull(form.getChoices());
         assertFalse(form.hasSheet(SETTINGS));
+        REQUIRED_SHEET_NAMES.forEach(s -> assertNotNull(form.getSheet(s)));
         assertMinimalHeaders(form);
     }
 
@@ -43,6 +44,7 @@ public class XLSFormTest {
         assertNotNull(form.getSurvey());
         assertNotNull(form.getChoices());
         assertNotNull(form.getSettings());
+        STANDARD_SHEET_NAMES.forEach(s -> assertNotNull(form.getSheet(s)));
         assertAllHeaders(form);
     }
 
