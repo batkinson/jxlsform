@@ -22,13 +22,13 @@ import static org.mockito.Mockito.when;
 public class RowTest {
 
     @Mock
-    com.github.batkinson.jxlsform.api.Row mockRow;
+    private com.github.batkinson.jxlsform.api.Row mockRow;
 
     @Mock
-    Sheet mockSheet;
+    private Sheet mockSheet;
 
     @Mock
-    Cell mockCell1, mockCell2;
+    private Cell mockCell1, mockCell2;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -74,5 +74,20 @@ public class RowTest {
         Row r = new Row(rowNum, cells);
         assertThat("lists expected to be equivalent", cells,
                 is(stream(r.spliterator(), false).collect(toList())));
+    }
+
+    @Test
+    public void getCellByName() {
+        int rowNum = 0;
+        String first = "first", second = "second";
+        Row r = new Row(rowNum, cells);
+        r.setSheet(mockSheet);
+        when(mockSheet.getHeader()).thenReturn(mockRow);
+        when(mockRow.getCell(first)).thenReturn(mockCell1);
+        when(mockRow.getCell(second)).thenReturn(mockCell2);
+        when(mockCell1.getCellNumber()).thenReturn(0);
+        when(mockCell2.getCellNumber()).thenReturn(1);
+        assertSame(mockCell1, r.getCell(first));
+        assertSame(mockCell2, r.getCell(second));
     }
 }

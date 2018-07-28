@@ -11,4 +11,6 @@ public interface Row extends Iterable<Cell> {
     boolean isHeader();
 
     Cell getCell(int index);
+
+    Cell getCell(String name);
 }

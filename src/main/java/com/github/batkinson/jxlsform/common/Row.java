@@ -44,6 +44,11 @@ public class Row implements com.github.batkinson.jxlsform.api.Row {
     }
 
     @Override
+    public Cell getCell(String name) {
+        return getCell(getSheet().getHeader().getCell(name).getCellNumber());
+    }
+
+    @Override
     public Iterator<Cell> iterator() {
         return cells.iterator();
     }
