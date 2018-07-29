@@ -8,29 +8,23 @@ import org.apache.poi.ss.usermodel.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSFormFactory {
 
     public XLSForm create(InputStream stream) throws XLSFormException {
         try {
-            Workbook workbook = WorkbookFactory.create(stream);
-            List<com.github.batkinson.jxlsform.api.Sheet> sheets = new ArrayList<>();
-            for (Sheet sheet : workbook) {
-                List<com.github.batkinson.jxlsform.api.Row> rows = new ArrayList<>();
-                for (Row row : sheet) {
-                    List<com.github.batkinson.jxlsform.api.Cell> cells = new ArrayList<>();
-                    for (Cell cell : row) {
-                        cells.add(new com.github.batkinson.jxlsform.common.Cell(cell.getColumnIndex(),
-                                translateType(cell.getCellTypeEnum()),
-                                translateValue(cell)));
+            com.github.batkinson.jxlsform.common.Workbook workbook = new com.github.batkinson.jxlsform.common.Workbook();
+            Workbook excelWorkbook = WorkbookFactory.create(stream);
+            for (Sheet excelSheet : excelWorkbook) {
+                com.github.batkinson.jxlsform.common.Sheet sheet = workbook.addSheet(excelSheet.getSheetName());
+                for (Row excelRow : excelSheet) {
+                    com.github.batkinson.jxlsform.common.Row row = sheet.addRow(excelRow.getRowNum());
+                    for (Cell excelCell : excelRow) {
+                        row.addCell(excelCell.getColumnIndex(), translateType(excelCell.getCellTypeEnum()), translateValue(excelCell));
                     }
-                    rows.add(new com.github.batkinson.jxlsform.common.Row(row.getRowNum(), cells));
                 }
-                sheets.add(new com.github.batkinson.jxlsform.common.Sheet(sheet.getSheetName(), rows));
             }
-            return new com.github.batkinson.jxlsform.common.XLSForm(sheets);
+            return new com.github.batkinson.jxlsform.common.XLSForm(workbook);
         } catch (IOException | EmptyFileException | InvalidFormatException e) {
             throw new XLSFormException("failed to create workbook from stream", e);
         }

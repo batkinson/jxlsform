@@ -1,59 +1,74 @@
 package com.github.batkinson.jxlsform.common;
 
-import com.github.batkinson.jxlsform.api.Sheet;
 import com.github.batkinson.jxlsform.api.XLSFormException;
-import org.hamcrest.Matchers;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.List;
+import java.util.Optional;
 
 import static com.github.batkinson.jxlsform.api.XLSForm.*;
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.when;
 
 public class XLSFormTest {
 
     @Mock
-    Sheet mockSheet1, mockSheet2, mockSheet3;
+    private com.github.batkinson.jxlsform.api.Workbook mockWb;
+
+    @Mock
+    private com.github.batkinson.jxlsform.api.Sheet mockSurveySheet, mockChoicesSheet, mockSettingsSheet;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private List<Sheet> sheets;
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
 
-    @Before
-    public void initLists() {
-        sheets = asList(mockSheet1, mockSheet2, mockSheet3);
+    @Test(expected = XLSFormException.class)
+    public void createWithNull() {
+        new XLSForm(null);
     }
 
     @Test
-    public void creation() {
-        when(mockSheet1.getName()).thenReturn(SURVEY);
-        when(mockSheet2.getName()).thenReturn(CHOICES);
-        when(mockSheet3.getName()).thenReturn(SETTINGS);
-        XLSForm f = new XLSForm(sheets);
-        assertThat("form iterates same sheets given at creation time", sheets,
-                Matchers.is(stream(f.spliterator(), false).collect(toList())));
-        assertSame(mockSheet1, f.getSurvey());
-        assertSame(mockSheet2, f.getChoices());
-        assertSame(mockSheet3, f.getSettings());
+    public void createWithoutSheets() {
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("survey sheet is required");
+        new XLSForm(mockWb);
     }
 
-    @Test(expected = XLSFormException.class)
-    public void getMissingSheet() {
-        when(mockSheet1.getName()).thenReturn(SURVEY);
-        when(mockSheet2.getName()).thenReturn(CHOICES);
-        when(mockSheet3.getName()).thenReturn(SETTINGS);
-        XLSForm f = new XLSForm(sheets);
-        f.getSheet("unknown sheet");
+    @Test
+    public void createWithoutChoices() {
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("choices sheet is required");
+        when(mockWb.getSheet(SURVEY)).thenReturn(Optional.of(mockSurveySheet));
+        new XLSForm(mockWb);
+    }
+
+    @Test
+    public void createWithRequiredSheets() {
+        when(mockWb.getSheet(SURVEY)).thenReturn(Optional.of(mockSurveySheet));
+        when(mockWb.getSheet(CHOICES)).thenReturn(Optional.of(mockChoicesSheet));
+        XLSForm form = new XLSForm(mockWb);
+        assertSame(mockWb, form.getWorkbook());
+        assertSame(mockSurveySheet, form.getSurvey());
+        assertSame(mockChoicesSheet, form.getChoices());
+        assertFalse(form.getSettings().isPresent());
+    }
+
+    @Test
+    public void createWithStandardSheets() {
+        when(mockWb.getSheet(SURVEY)).thenReturn(Optional.of(mockSurveySheet));
+        when(mockWb.getSheet(CHOICES)).thenReturn(Optional.of(mockChoicesSheet));
+        when(mockWb.getSheet(SETTINGS)).thenReturn(Optional.of(mockSettingsSheet));
+        XLSForm form = new XLSForm(mockWb);
+        assertSame(mockWb, form.getWorkbook());
+        assertSame(mockSurveySheet, form.getSurvey());
+        assertSame(mockChoicesSheet, form.getChoices());
+        assertSame(mockSettingsSheet, form.getSettings().orElseThrow(() -> new XLSFormException("expected settings sheet to exist")));
     }
 }

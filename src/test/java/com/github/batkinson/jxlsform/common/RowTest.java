@@ -1,93 +1,92 @@
 package com.github.batkinson.jxlsform.common;
 
-import com.github.batkinson.jxlsform.api.Cell;
 import com.github.batkinson.jxlsform.api.Sheet;
-import org.junit.Before;
+import com.github.batkinson.jxlsform.api.XLSFormException;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.List;
+import java.util.Iterator;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
-import static junit.framework.TestCase.assertTrue;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 public class RowTest {
 
     @Mock
-    private com.github.batkinson.jxlsform.api.Row mockRow;
-
-    @Mock
     private Sheet mockSheet;
 
     @Mock
-    private Cell mockCell1, mockCell2;
+    private Row mockHeader;
+
+    @Mock
+    private Cell mockHeaderCell;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private List<Cell> cells;
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
 
-    @Before
-    public void setupList() {
-        cells = asList(mockCell1, mockCell2);
+    @Test
+    public void createNoSheet() {
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("sheet is required");
+        new Row(null, 0);
     }
 
     @Test
-    public void creation() {
-        int rowNum = 0;
-        Row r = new Row(rowNum, cells);
-        assertEquals(rowNum, r.getRowNumber());
-        assertSame(mockCell1, r.getCell(0));
-        assertSame(mockCell2, r.getCell(1));
+    public void createNegativeSheet() {
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("row number can not be negative");
+        new Row(mockSheet, -1);
     }
 
     @Test
-    public void setSheet() {
+    public void create() {
         int rowNum = 0;
-        Row r = new Row(rowNum, cells);
-        r.setSheet(mockSheet);
-        assertSame(mockSheet, r.getSheet());
+        Row row = new Row(mockSheet, rowNum);
+        assertSame(mockSheet, row.getSheet());
+        assertEquals(rowNum, row.getRowNumber());
+    }
+
+    @Test
+    public void addCell() {
+        Row row = new Row(mockSheet, 0);
+        Cell cell = row.addCell(0, Cell.Type.BLANK, "");
+        Iterator<com.github.batkinson.jxlsform.api.Cell> iter = row.iterator();
+        assertSame(cell, iter.next());
+        assertFalse("expected added cell only", iter.hasNext());
+    }
+
+    @Test
+    public void getCellByIndex() {
+        Row row = new Row(mockSheet, 0);
+        for (int i = 0; i < 3; i++) {
+            Cell cell = row.addCell(i, Cell.Type.BLANK, "");
+            assertSame(cell, row.getCell(i));
+        }
     }
 
     @Test
     public void isHeader() {
-        int rowNum = 0;
-        Row r = new Row(rowNum, cells);
-        r.setSheet(mockSheet);
-        when(mockSheet.getHeader()).thenReturn(r);
-        assertTrue("row is header, but reports otherwise", r.isHeader());
-        when(mockSheet.getHeader()).thenReturn(mockRow);
-        assertFalse("row is not header, but reports as one", r.isHeader());
-    }
-
-    @Test
-    public void iterator() {
-        int rowNum = 0;
-        Row r = new Row(rowNum, cells);
-        assertThat("lists expected to be equivalent", cells,
-                is(stream(r.spliterator(), false).collect(toList())));
+        Row row = new Row(mockSheet, 0);
+        when(mockSheet.getHeader()).thenReturn(row);
+        assertTrue(row.isHeader());
     }
 
     @Test
     public void getCellByName() {
-        int rowNum = 0;
-        String first = "first", second = "second";
-        Row r = new Row(rowNum, cells);
-        r.setSheet(mockSheet);
-        when(mockSheet.getHeader()).thenReturn(mockRow);
-        when(mockRow.getCell(first)).thenReturn(mockCell1);
-        when(mockRow.getCell(second)).thenReturn(mockCell2);
-        when(mockCell1.getCellNumber()).thenReturn(0);
-        when(mockCell2.getCellNumber()).thenReturn(1);
-        assertSame(mockCell1, r.getCell(first));
-        assertSame(mockCell2, r.getCell(second));
+        int cellNum = 0;
+        String cellName = "name";
+        when(mockSheet.getHeader()).thenReturn(mockHeader);
+        when(mockHeader.getCell(cellName)).thenReturn(mockHeaderCell);
+        when(mockHeaderCell.getCellNumber()).thenReturn(cellNum);
+        Row row = new Row(mockSheet, 1);
+        Cell cell = row.addCell(cellNum, Cell.Type.BLANK, "");
+        assertSame(cell, row.getCell(cellName));
     }
 }

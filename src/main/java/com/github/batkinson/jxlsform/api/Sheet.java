@@ -2,9 +2,7 @@ package com.github.batkinson.jxlsform.api;
 
 public interface Sheet extends Iterable<Row> {
 
-    XLSForm getForm();
-
-    void setForm(XLSForm form);
+    Workbook getWorkbook();
 
     String getName();
 

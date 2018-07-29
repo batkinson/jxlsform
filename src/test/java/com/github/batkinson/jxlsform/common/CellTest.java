@@ -1,10 +1,10 @@
 package com.github.batkinson.jxlsform.common;
 
 import com.github.batkinson.jxlsform.api.Row;
-import com.github.batkinson.jxlsform.api.Sheet;
 import com.github.batkinson.jxlsform.api.XLSFormException;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -16,51 +16,72 @@ import static org.mockito.Mockito.when;
 public class CellTest {
 
     @Mock
-    private Row mockRow, mockHeader;
+    private Row mockRow;
 
     @Mock
     private Sheet mockSheet;
 
     @Mock
-    private com.github.batkinson.jxlsform.api.Cell mockCell;
+    private Row mockHeader;
+
+    @Mock
+    private Cell mockHeaderCell;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private int cellNum = 0;
-    private Cell.Type type = Cell.Type.STRING;
-    private String value = "a value";
-    private String name = "a name";
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
 
     @Test
-    public void createSimple() {
-        Cell c = new Cell(cellNum, type, value);
-        assertEquals(0, c.getCellNumber());
-        assertEquals(type, c.getType());
-        assertEquals(value, c.getValue());
+    public void createNoRow() {
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("row is required");
+        new Cell(null, 0, Cell.Type.BLANK, "");
+    }
+
+    @Test
+    public void createNegativeCellNum() {
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("cell number can not be negative");
+        new Cell(mockRow, -1, Cell.Type.BLANK, "");
+    }
+
+    @Test
+    public void createNoType() {
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("type is required");
+        new Cell(mockRow, 0, null, "");
+    }
+
+    @Test
+    public void createNoValue() {
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("value is required");
+        new Cell(mockRow, 0, Cell.Type.BLANK, null);
+    }
+
+    @Test
+    public void create() {
+        int num = 0;
+        Cell.Type type = Cell.Type.STRING;
+        Object value = "sample value";
+        Cell cell = new Cell(mockRow, num, type, value);
+        assertSame(mockRow, cell.getRow());
+        assertEquals(num, cell.getCellNumber());
+        assertEquals(type, cell.getType());
+        assertEquals(value, cell.getValue());
     }
 
     @Test
     public void getName() {
-        Cell c = new Cell(cellNum, type, value);
+        int cellNum = 0;
+        String headerName = "cell-one";
         when(mockRow.getSheet()).thenReturn(mockSheet);
         when(mockSheet.getHeader()).thenReturn(mockHeader);
-        when(mockHeader.getCell(cellNum)).thenReturn(mockCell);
-        when(mockCell.toString()).thenReturn(name);
-        c.setRow(mockRow);
-        assertEquals(name, c.getName());
-    }
-
-    @Test(expected = XLSFormException.class)
-    public void getRowBeforeSet() {
-        Cell c = new Cell(cellNum, type, value);
-        c.getRow();
-    }
-
-    @Test
-    public void getRow() {
-        Cell c = new Cell(cellNum, type, value);
-        c.setRow(mockRow);
-        assertSame(mockRow, c.getRow());
+        when(mockHeader.getCell(cellNum)).thenReturn(mockHeaderCell);
+        when(mockHeaderCell.getValue()).thenReturn(headerName);
+        Cell cell = new Cell(mockRow, cellNum, Cell.Type.STRING, "sample value");
+        assertEquals(headerName, cell.getName());
     }
 }

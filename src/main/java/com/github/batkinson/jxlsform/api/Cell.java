@@ -6,8 +6,6 @@ public interface Cell {
 
     Row getRow();
 
-    void setRow(Row row);
-
     int getCellNumber();
 
     Type getType();

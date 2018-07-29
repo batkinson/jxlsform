@@ -1,5 +1,6 @@
 package com.github.batkinson.jxlsform.poi;
 
+import com.github.batkinson.jxlsform.api.Workbook;
 import com.github.batkinson.jxlsform.api.XLSForm;
 import com.github.batkinson.jxlsform.api.XLSFormException;
 import org.junit.Test;
@@ -12,7 +13,7 @@ import static com.github.batkinson.jxlsform.api.XLSForm.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-public class XLSFormTest {
+public class XLSFormIntegrationTest {
 
     @Test(expected = XLSFormException.class)
     public void createWithBadStream() {
@@ -42,8 +43,9 @@ public class XLSFormTest {
     private void assertMinimal(XLSForm form) {
         assertNotNull(form.getSurvey());
         assertNotNull(form.getChoices());
-        assertFalse(form.hasSheet(SETTINGS));
-        REQUIRED_SHEET_NAMES.forEach(s -> assertNotNull(form.getSheet(s)));
+        Workbook workbook = form.getWorkbook();
+        assertFalse(workbook.getSheet(SETTINGS).isPresent());
+        REQUIRED_SHEETS.forEach(s -> assertNotNull(workbook.getSheet(s)));
         assertMinimalHeaders(form);
     }
 
@@ -51,7 +53,7 @@ public class XLSFormTest {
         assertNotNull(form.getSurvey());
         assertNotNull(form.getChoices());
         assertNotNull(form.getSettings());
-        STANDARD_SHEET_NAMES.forEach(s -> assertNotNull(form.getSheet(s)));
+        STANDARD.forEach(s -> assertNotNull(form.getWorkbook().getSheet(s)));
         assertAllHeaders(form);
     }
 
@@ -62,12 +64,13 @@ public class XLSFormTest {
 
     private void assertAllHeaders(XLSForm form) {
         assertMinimalHeaders(form);
-        assertNotNull(form.getSettings().getHeader());
+        assertNotNull(form.getSettings().orElseThrow(
+                () -> new RuntimeException("expected settings sheet to exist")).getHeader());
     }
 
     private XLSForm form(String fileName) throws IOException {
         String dir = fileName.endsWith(".xls") ? "/xls" : "/xlsx";
-        try (InputStream stream = XLSFormTest.class.getResourceAsStream(String.join("/", dir, fileName))) {
+        try (InputStream stream = XLSFormIntegrationTest.class.getResourceAsStream(String.join("/", dir, fileName))) {
             return new XLSFormFactory().create(stream);
         }
     }

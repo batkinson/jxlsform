@@ -1,23 +1,22 @@
 package com.github.batkinson.jxlsform.api;
 
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
 
-public interface XLSForm extends Iterable<Sheet> {
+public interface XLSForm {
 
     String SURVEY = "survey", CHOICES = "choices", SETTINGS = "settings";
-    Set<String> REQUIRED_SHEET_NAMES = new LinkedHashSet<>(asList(SURVEY, CHOICES));
-    Set<String> STANDARD_SHEET_NAMES = new LinkedHashSet<>(asList(SURVEY, CHOICES, SETTINGS));
+    Set<String> REQUIRED_SHEETS = new LinkedHashSet<>(asList(SURVEY, CHOICES));
+    Set<String> STANDARD = new LinkedHashSet<>(asList(SURVEY, CHOICES, SETTINGS));
 
-    boolean hasSheet(String name);
-
-    Sheet getSheet(String name);
+    Workbook getWorkbook();
 
     Sheet getSurvey();
 
     Sheet getChoices();
 
-    Sheet getSettings();
+    Optional<Sheet> getSettings();
 }

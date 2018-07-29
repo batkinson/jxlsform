@@ -1,54 +1,42 @@
 package com.github.batkinson.jxlsform.common;
 
-import com.github.batkinson.jxlsform.api.Sheet;
 import com.github.batkinson.jxlsform.api.XLSFormException;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.Optional;
 
 public class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
 
-    private final LinkedHashMap<String, Sheet> sheets;
+    private final com.github.batkinson.jxlsform.api.Workbook workbook;
 
-    public XLSForm(List<Sheet> sheets) {
-        this.sheets = new LinkedHashMap<>();
-        for (Sheet sheet : sheets) {
-            this.sheets.put(sheet.getName(), sheet);
-            sheet.setForm(this);
+    public XLSForm(com.github.batkinson.jxlsform.api.Workbook workbook) {
+        if (workbook == null) {
+            throw new XLSFormException("workbook is required");
         }
+        this.workbook = workbook;
+        REQUIRED_SHEETS.forEach(sheetName -> {
+            if (!workbook.getSheet(sheetName).isPresent()) {
+                throw new XLSFormException(sheetName + " sheet is required");
+            }
+        });
     }
 
     @Override
-    public boolean hasSheet(String name) {
-        return sheets.containsKey(name);
+    public com.github.batkinson.jxlsform.api.Workbook getWorkbook() {
+        return workbook;
     }
 
     @Override
-    public Sheet getSheet(String name) {
-        if (sheets.containsKey(name)) {
-            return sheets.get(name);
-        }
-        throw new XLSFormException("no sheet named " + name);
+    public com.github.batkinson.jxlsform.api.Sheet getSurvey() {
+        return workbook.getSheet(SURVEY).orElseThrow(() -> new XLSFormException("no survey sheet"));
     }
 
     @Override
-    public Sheet getSurvey() {
-        return getSheet(SURVEY);
+    public com.github.batkinson.jxlsform.api.Sheet getChoices() {
+        return workbook.getSheet(CHOICES).orElseThrow(() -> new XLSFormException("no choices sheet"));
     }
 
     @Override
-    public Sheet getChoices() {
-        return getSheet(CHOICES);
-    }
-
-    @Override
-    public Sheet getSettings() {
-        return getSheet(SETTINGS);
-    }
-
-    @Override
-    public Iterator<Sheet> iterator() {
-        return sheets.values().iterator();
+    public Optional<com.github.batkinson.jxlsform.api.Sheet> getSettings() {
+        return workbook.getSheet(SETTINGS);
     }
 }
