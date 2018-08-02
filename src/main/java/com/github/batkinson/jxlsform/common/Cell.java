@@ -1,21 +1,23 @@
 package com.github.batkinson.jxlsform.common;
 
-import com.github.batkinson.jxlsform.api.Row;
 import com.github.batkinson.jxlsform.api.XLSFormException;
 
 public class Cell implements com.github.batkinson.jxlsform.api.Cell {
 
-    private final Row row;
-    private final int cellNumber;
+    private final com.github.batkinson.jxlsform.api.Row row;
+    private final String col;
     private final Type type;
     private final Object value;
 
-    Cell(Row row, int cellNumber, Type type, Object value) {
+    Cell(com.github.batkinson.jxlsform.api.Row row, String col, Type type, Object value) {
         if (row == null) {
             throw new XLSFormException("row is required");
         }
-        if (cellNumber < 0) {
-            throw new XLSFormException("cell number can not be negative");
+        if (col == null) {
+            throw new XLSFormException("column is required");
+        }
+        if (!col.matches("[a-zA-Z]+")) {
+            throw new XLSFormException("column must be a series of letters");
         }
         if (type == null) {
             throw new XLSFormException("type is required");
@@ -24,7 +26,7 @@ public class Cell implements com.github.batkinson.jxlsform.api.Cell {
             throw new XLSFormException("value is required");
         }
         this.row = row;
-        this.cellNumber = cellNumber;
+        this.col = col;
         this.type = type;
         this.value = value;
     }
@@ -35,22 +37,30 @@ public class Cell implements com.github.batkinson.jxlsform.api.Cell {
     }
 
     @Override
-    public Row getRow() {
+    public com.github.batkinson.jxlsform.api.Row getRow() {
         return row;
     }
 
     @Override
-    public int getCellNumber() {
-        return cellNumber;
+    public String getCol() {
+        return col;
     }
 
     @Override
     public String getName() {
-        return row.getSheet().getHeader().getCell(getCellNumber()).getValue();
+        return row.getSheet().getHeader()
+                .getCell(getCol())
+                .orElseThrow(() -> new XLSFormException("cell for header " + getCol() + " not found"))
+                .getValue();
     }
 
     @Override
     public String getValue() {
         return value.toString();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("cell %s%d, value '%s'", getCol(), row.getRowNumber(), getValue());
     }
 }

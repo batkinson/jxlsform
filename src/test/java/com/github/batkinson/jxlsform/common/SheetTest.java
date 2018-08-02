@@ -9,7 +9,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 
 public class SheetTest {
@@ -48,34 +52,67 @@ public class SheetTest {
     @Test
     public void addHeader() {
         Sheet sheet = new Sheet(mockWb, "don't care");
-        Row row = sheet.addRow(0);
+        Row row = sheet.addRow(1);
         assertSame(row, sheet.getHeader());
         Iterator<com.github.batkinson.jxlsform.api.Row> iter = sheet.iterator();
         assertSame(row, iter.next());
         assertFalse("expected only the row added", iter.hasNext());
-        sheet.getData().forEach((r) -> fail("data should be empty"));
+        StreamSupport.stream(sheet.spliterator(), false)
+                .filter(r -> !r.isHeader())
+                .forEach(r -> fail("data should be empty"));
     }
 
     @Test
     public void addHeaderAndData() {
         Sheet sheet = new Sheet(mockWb, "don't care");
-        Row row1 = sheet.addRow(0), row2 = sheet.addRow(1);
+        Row row1 = sheet.addRow(1), row2 = sheet.addRow(2);
         assertSame(row1, sheet.getHeader());
-        Iterator<com.github.batkinson.jxlsform.api.Row> iter = sheet.iterator(), dataIter = sheet.getData().iterator();
+        Iterator<com.github.batkinson.jxlsform.api.Row> iter = sheet.iterator();
         assertSame(row1, iter.next());
         assertSame(row2, iter.next());
         assertFalse("expected only the rows added", iter.hasNext());
-        assertSame(row2, dataIter.next());
-        assertFalse("expected only second row", dataIter.hasNext());
-
     }
 
     @Test
     public void getRow() {
         Sheet sheet = new Sheet(mockWb, "don't care");
-        for (int i = 0; i < 10; i++) {
+        for (int i = 1; i <= 10; i++) {
             Row added = sheet.addRow(i);
-            assertSame(added, sheet.getRow(i));
+            Optional<com.github.batkinson.jxlsform.api.Row> maybeRow = sheet.getRow(i);
+            assertTrue(maybeRow.isPresent());
+            assertSame(added, maybeRow.get());
         }
+    }
+
+    @Test
+    public void getCellExists() {
+        List<Integer> rows = asList(1, 2, 3);
+        List<String> cols = asList("A", "B", "D");
+        Sheet sheet = new Sheet(mockWb, "don't care");
+
+        // load cells with their addresses C1 has value 'C1'
+        for (Integer rowNum : rows) {
+            Row row = sheet.addRow(rowNum);
+            for (String col : cols) {
+                row.addCell(col, Cell.Type.STRING, col + rowNum);
+            }
+        }
+
+        // verify all cells have appropriate contents when fetched
+        for (Integer row : rows) {
+            for (String col : cols) {
+                Optional<com.github.batkinson.jxlsform.api.Cell> maybeCell = sheet.getCell(col, row);
+                assertTrue(maybeCell.isPresent());
+                assertEquals(col + row, maybeCell.get().getValue());
+            }
+        }
+    }
+
+    @Test
+    public void getCellNotExists() {
+        assertFalse(
+                new Sheet(mockWb, "don't care")
+                        .getCell("A", 1)
+                        .isPresent());
     }
 }

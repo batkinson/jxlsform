@@ -7,17 +7,19 @@ import java.util.Optional;
 public class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
 
     private final com.github.batkinson.jxlsform.api.Workbook workbook;
+    private final Survey survey;
 
     public XLSForm(com.github.batkinson.jxlsform.api.Workbook workbook) {
         if (workbook == null) {
             throw new XLSFormException("workbook is required");
         }
         this.workbook = workbook;
-        REQUIRED_SHEETS.forEach(sheetName -> {
-            if (!workbook.getSheet(sheetName).isPresent()) {
-                throw new XLSFormException(sheetName + " sheet is required");
-            }
-        });
+        survey = new Survey(this,
+                workbook.getSheet(SURVEY)
+                        .orElseThrow(() -> new XLSFormException("survey sheet is required")));
+        if (!workbook.getSheet(CHOICES).isPresent()) {
+            throw new XLSFormException(CHOICES + " sheet is required");
+        }
     }
 
     @Override
@@ -26,8 +28,8 @@ public class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
     }
 
     @Override
-    public com.github.batkinson.jxlsform.api.Sheet getSurvey() {
-        return workbook.getSheet(SURVEY).orElseThrow(() -> new XLSFormException("no survey sheet"));
+    public Survey getSurvey() {
+        return survey;
     }
 
     @Override

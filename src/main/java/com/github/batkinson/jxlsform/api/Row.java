@@ -1,5 +1,7 @@
 package com.github.batkinson.jxlsform.api;
 
+import java.util.Optional;
+
 public interface Row extends Iterable<Cell> {
 
     Sheet getSheet();
@@ -8,7 +10,8 @@ public interface Row extends Iterable<Cell> {
 
     boolean isHeader();
 
-    Cell getCell(int index);
+    Optional<Cell> getCell(String col);
 
-    Cell getCell(String name);
+    Optional<Cell> getCellByHeader(String name);
+
 }

@@ -11,8 +11,7 @@ import org.mockito.junit.MockitoRule;
 import java.util.Optional;
 
 import static com.github.batkinson.jxlsform.api.XLSForm.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 public class XLSFormTest {
@@ -55,7 +54,7 @@ public class XLSFormTest {
         when(mockWb.getSheet(CHOICES)).thenReturn(Optional.of(mockChoicesSheet));
         XLSForm form = new XLSForm(mockWb);
         assertSame(mockWb, form.getWorkbook());
-        assertSame(mockSurveySheet, form.getSurvey());
+        assertNotNull(form.getSurvey());
         assertSame(mockChoicesSheet, form.getChoices());
         assertFalse(form.getSettings().isPresent());
     }
@@ -67,8 +66,9 @@ public class XLSFormTest {
         when(mockWb.getSheet(SETTINGS)).thenReturn(Optional.of(mockSettingsSheet));
         XLSForm form = new XLSForm(mockWb);
         assertSame(mockWb, form.getWorkbook());
-        assertSame(mockSurveySheet, form.getSurvey());
+        assertNotNull(form.getSurvey());
         assertSame(mockChoicesSheet, form.getChoices());
-        assertSame(mockSettingsSheet, form.getSettings().orElseThrow(() -> new XLSFormException("expected settings sheet to exist")));
+        assertSame(mockSettingsSheet, form.getSettings()
+                .orElseThrow(() -> new XLSFormException("expected settings sheet to exist")));
     }
 }

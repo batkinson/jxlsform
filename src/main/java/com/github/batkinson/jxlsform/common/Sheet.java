@@ -2,17 +2,16 @@ package com.github.batkinson.jxlsform.common;
 
 import com.github.batkinson.jxlsform.api.XLSFormException;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-
-import static java.util.Collections.EMPTY_LIST;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 
 public class Sheet implements com.github.batkinson.jxlsform.api.Sheet {
 
     private final com.github.batkinson.jxlsform.api.Workbook workbook;
     private final String name;
-    private final List<com.github.batkinson.jxlsform.api.Row> rows = new ArrayList<>();
+    private final Map<Integer, com.github.batkinson.jxlsform.api.Row> rows = new TreeMap<>();
     private com.github.batkinson.jxlsform.api.Row header;
 
     Sheet(com.github.batkinson.jxlsform.api.Workbook workbook, String name) {
@@ -26,12 +25,14 @@ public class Sheet implements com.github.batkinson.jxlsform.api.Sheet {
         this.name = name;
     }
 
-    public Row addRow(int rowNumber) {
-        Row newRow = new Row(this, rowNumber);
-        rows.add(newRow);
+    public Row addRow(int row) {
+        Row newRow;
         if (header == null) {
-            header = newRow;
+            header = newRow = new Header(this, row);
+        } else {
+            newRow = new Row(this, row);
         }
+        rows.put(row, newRow);
         return newRow;
     }
 
@@ -51,17 +52,22 @@ public class Sheet implements com.github.batkinson.jxlsform.api.Sheet {
     }
 
     @Override
-    public Iterable<com.github.batkinson.jxlsform.api.Row> getData() {
-        return rows.size() < 2 ? EMPTY_LIST : rows.subList(1, rows.size());
+    public Optional<com.github.batkinson.jxlsform.api.Row> getRow(int row) {
+        return Optional.ofNullable(rows.get(row));
     }
 
     @Override
-    public com.github.batkinson.jxlsform.api.Row getRow(int index) {
-        return rows.get(index);
+    public Optional<com.github.batkinson.jxlsform.api.Cell> getCell(String col, int row) {
+        return getRow(row).flatMap((r) -> r.getCell(col));
     }
 
     @Override
     public Iterator<com.github.batkinson.jxlsform.api.Row> iterator() {
-        return rows.iterator();
+        return rows.values().iterator();
+    }
+
+    @Override
+    public String toString() {
+        return name + " sheet";
     }
 }

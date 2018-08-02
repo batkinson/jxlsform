@@ -2,30 +2,31 @@ package com.github.batkinson.jxlsform.common;
 
 import com.github.batkinson.jxlsform.api.XLSFormException;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 
 public class Row implements com.github.batkinson.jxlsform.api.Row {
 
     private final com.github.batkinson.jxlsform.api.Sheet sheet;
     private final int rowNumber;
-    private final List<com.github.batkinson.jxlsform.api.Cell> cells = new ArrayList<>();
+    private final Map<String, com.github.batkinson.jxlsform.api.Cell> cells = new TreeMap<>();
 
     public Row(com.github.batkinson.jxlsform.api.Sheet sheet, int rowNumber) {
         if (sheet == null) {
             throw new XLSFormException("sheet is required");
         }
-        if (rowNumber < 0) {
-            throw new XLSFormException("row number can not be negative");
+        if (rowNumber <= 0) {
+            throw new XLSFormException("row number must be greater than zero");
         }
         this.sheet = sheet;
         this.rowNumber = rowNumber;
     }
 
-    public Cell addCell(int cellNum, Cell.Type cellType, Object cellValue) {
-        Cell newCell = new Cell(this, cellNum, cellType, cellValue);
-        cells.add(newCell);
+    public Cell addCell(String colName, Cell.Type cellType, Object cellValue) {
+        Cell newCell = new Cell(this, colName, cellType, cellValue);
+        cells.put(colName, newCell);
         return newCell;
     }
 
@@ -45,17 +46,26 @@ public class Row implements com.github.batkinson.jxlsform.api.Row {
     }
 
     @Override
-    public com.github.batkinson.jxlsform.api.Cell getCell(int index) {
-        return cells.get(index);
+    public Optional<com.github.batkinson.jxlsform.api.Cell> getCell(String col) {
+        return Optional.ofNullable(cells.get(col));
     }
 
     @Override
-    public com.github.batkinson.jxlsform.api.Cell getCell(String name) {
-        return getCell(getSheet().getHeader().getCell(name).getCellNumber());
+    public Optional<com.github.batkinson.jxlsform.api.Cell> getCellByHeader(String name) {
+        return getCell(getSheet()
+                .getHeader()
+                .getCellByHeader(name)
+                .orElseThrow(() -> new XLSFormException("cell for header " + name + " not found"))
+                .getCol());
     }
 
     @Override
     public Iterator<com.github.batkinson.jxlsform.api.Cell> iterator() {
-        return cells.iterator();
+        return cells.values().iterator();
+    }
+
+    @Override
+    public String toString() {
+        return "row " + rowNumber;
     }
 }

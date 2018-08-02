@@ -10,11 +10,11 @@ public interface XLSForm {
 
     String SURVEY = "survey", CHOICES = "choices", SETTINGS = "settings";
     Set<String> REQUIRED_SHEETS = new LinkedHashSet<>(asList(SURVEY, CHOICES));
-    Set<String> STANDARD = new LinkedHashSet<>(asList(SURVEY, CHOICES, SETTINGS));
+    Set<String> STANDARD_SHEETS = new LinkedHashSet<>(asList(SURVEY, CHOICES, SETTINGS));
 
     Workbook getWorkbook();
 
-    Sheet getSurvey();
+    Survey getSurvey();
 
     Sheet getChoices();
 

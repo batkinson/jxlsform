@@ -6,7 +6,7 @@ public interface Cell {
 
     Row getRow();
 
-    int getCellNumber();
+    String getCol();
 
     Type getType();
 
