@@ -1,5 +1,6 @@
 package com.github.batkinson.jxlsform.poi;
 
+import com.github.batkinson.jxlsform.api.Settings;
 import com.github.batkinson.jxlsform.api.Workbook;
 import com.github.batkinson.jxlsform.api.XLSForm;
 import com.github.batkinson.jxlsform.api.XLSFormException;
@@ -116,7 +117,7 @@ public class XLSFormIntegrationTest {
 
     private void assertAllHeaders(XLSForm form) {
         assertMinimalHeaders(form);
-        assertNotNull(form.getSettings().orElseThrow(
+        assertNotNull(form.getSettings().map(Settings::getSheet).orElseThrow(
                 () -> new RuntimeException("expected settings sheet to exist")).getHeader());
     }
 

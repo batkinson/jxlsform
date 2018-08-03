@@ -1,6 +1,5 @@
 package com.github.batkinson.jxlsform.common;
 
-import com.github.batkinson.jxlsform.api.Cell;
 import com.github.batkinson.jxlsform.api.XLSFormException;
 
 import java.util.LinkedHashMap;
@@ -31,7 +30,9 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
         stream(choices.getSheet().spliterator(), false)
                 .filter(row -> !row.isHeader())
                 .map(row -> row.getCellByHeader("list_name"))
-                .flatMap(cell -> cell.map(Cell::getValue).map(Stream::of).orElseGet(Stream::empty))
+                .flatMap(cell -> cell.map(com.github.batkinson.jxlsform.api.Cell::getValue)
+                        .map(Stream::of)
+                        .orElseGet(Stream::empty))
                 .distinct()
                 .map(listName -> new ChoiceList(choices, listName))
                 .forEachOrdered(list -> {
@@ -42,9 +43,11 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
         // add the choices
         stream(choices.getSheet().spliterator(), false)
                 .filter(row -> !row.isHeader())
-                .filter(row -> row.getCellByHeader("list_name").map(Cell::getValue).isPresent())
+                .filter(row -> row.getCellByHeader("list_name")
+                        .map(com.github.batkinson.jxlsform.api.Cell::getValue).isPresent())
                 .forEachOrdered(row -> {
-                    String listName = row.getCellByHeader("list_name").map(Cell::getValue).orElse("");
+                    String listName = row.getCellByHeader("list_name")
+                            .map(com.github.batkinson.jxlsform.api.Cell::getValue).orElse("");
                     ChoiceList list = lists.get(listName);
                     list.add(new Choice(list, row));
                 });
@@ -60,7 +63,8 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
                 .filter(row -> !row.isHeader())
                 .filter(row -> row.getCellByHeader("type").isPresent())
                 .forEachOrdered(row -> {
-                    String type = row.getCellByHeader("type").map(Cell::getValue).orElse("");
+                    String type = row.getCellByHeader("type")
+                            .map(com.github.batkinson.jxlsform.api.Cell::getValue).orElse("");
                     switch (type) {
                         case "begin group":
                             groupStack.push(new Group(survey, groupStack.peek(), row));

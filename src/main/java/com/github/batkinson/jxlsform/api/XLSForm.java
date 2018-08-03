@@ -18,5 +18,5 @@ public interface XLSForm {
 
     Choices getChoices();
 
-    Optional<Sheet> getSettings();
+    Optional<Settings> getSettings();
 }

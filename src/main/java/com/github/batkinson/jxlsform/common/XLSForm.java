@@ -9,6 +9,7 @@ public class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
     private final com.github.batkinson.jxlsform.api.Workbook workbook;
     private final Survey survey;
     private final Choices choices;
+    private final Settings settings;
 
     public XLSForm(com.github.batkinson.jxlsform.api.Workbook workbook) {
         if (workbook == null) {
@@ -21,6 +22,9 @@ public class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
         choices = new Choices(this,
                 workbook.getSheet(CHOICES)
                         .orElseThrow(() -> new XLSFormException("choices sheet is required")));
+        settings = workbook.getSheet(SETTINGS)
+                .map(sheet -> new Settings(this, sheet))
+                .orElse(null);
     }
 
     @Override
@@ -39,7 +43,7 @@ public class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
     }
 
     @Override
-    public Optional<com.github.batkinson.jxlsform.api.Sheet> getSettings() {
-        return workbook.getSheet(SETTINGS);
+    public Optional<com.github.batkinson.jxlsform.api.Settings> getSettings() {
+        return Optional.ofNullable(settings);
     }
 }
