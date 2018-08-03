@@ -55,7 +55,7 @@ public class XLSFormTest {
         XLSForm form = new XLSForm(mockWb);
         assertSame(mockWb, form.getWorkbook());
         assertNotNull(form.getSurvey());
-        assertSame(mockChoicesSheet, form.getChoices());
+        assertNotNull(form.getChoices());
         assertFalse(form.getSettings().isPresent());
     }
 
@@ -67,7 +67,7 @@ public class XLSFormTest {
         XLSForm form = new XLSForm(mockWb);
         assertSame(mockWb, form.getWorkbook());
         assertNotNull(form.getSurvey());
-        assertSame(mockChoicesSheet, form.getChoices());
+        assertNotNull(form.getChoices());
         assertSame(mockSettingsSheet, form.getSettings()
                 .orElseThrow(() -> new XLSFormException("expected settings sheet to exist")));
     }

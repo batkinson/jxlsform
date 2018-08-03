@@ -13,8 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static com.github.batkinson.jxlsform.api.XLSForm.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class XLSFormIntegrationTest {
 
@@ -82,6 +81,17 @@ public class XLSFormIntegrationTest {
         form("earlyendrepeat.xlsx");
     }
 
+    @Test
+    public void testChoicesXlsx() throws IOException {
+        assertEquals("label", form("choices.xlsx")
+                .getChoices()
+                .getChoiceList("list1")
+                .flatMap(list -> list.getChoice("value"))
+                .orElseThrow(() -> new XLSFormException("expected choice list1->value"))
+                .getLabel()
+                .orElse("choice label not present"));
+    }
+
     private void assertMinimal(XLSForm form) {
         assertNotNull(form.getSurvey());
         assertNotNull(form.getChoices());
@@ -101,7 +111,7 @@ public class XLSFormIntegrationTest {
 
     private void assertMinimalHeaders(XLSForm form) {
         assertNotNull(form.getSurvey().getSheet().getHeader());
-        assertNotNull(form.getChoices().getHeader());
+        assertNotNull(form.getChoices().getSheet().getHeader());
     }
 
     private void assertAllHeaders(XLSForm form) {

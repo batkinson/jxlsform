@@ -16,7 +16,7 @@ public interface XLSForm {
 
     Survey getSurvey();
 
-    Sheet getChoices();
+    Choices getChoices();
 
     Optional<Sheet> getSettings();
 }

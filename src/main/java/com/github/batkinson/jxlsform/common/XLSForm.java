@@ -8,6 +8,7 @@ public class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
 
     private final com.github.batkinson.jxlsform.api.Workbook workbook;
     private final Survey survey;
+    private final Choices choices;
 
     public XLSForm(com.github.batkinson.jxlsform.api.Workbook workbook) {
         if (workbook == null) {
@@ -17,9 +18,9 @@ public class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
         survey = new Survey(this,
                 workbook.getSheet(SURVEY)
                         .orElseThrow(() -> new XLSFormException("survey sheet is required")));
-        if (!workbook.getSheet(CHOICES).isPresent()) {
-            throw new XLSFormException(CHOICES + " sheet is required");
-        }
+        choices = new Choices(this,
+                workbook.getSheet(CHOICES)
+                        .orElseThrow(() -> new XLSFormException("choices sheet is required")));
     }
 
     @Override
@@ -33,8 +34,8 @@ public class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
     }
 
     @Override
-    public com.github.batkinson.jxlsform.api.Sheet getChoices() {
-        return workbook.getSheet(CHOICES).orElseThrow(() -> new XLSFormException("no choices sheet"));
+    public Choices getChoices() {
+        return choices;
     }
 
     @Override
