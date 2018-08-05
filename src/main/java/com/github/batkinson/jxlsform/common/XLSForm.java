@@ -4,7 +4,7 @@ import com.github.batkinson.jxlsform.api.XLSFormException;
 
 import java.util.Optional;
 
-public class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
+class XLSForm implements com.github.batkinson.jxlsform.api.XLSForm {
 
     private final com.github.batkinson.jxlsform.api.Workbook workbook;
     private final Survey survey;
