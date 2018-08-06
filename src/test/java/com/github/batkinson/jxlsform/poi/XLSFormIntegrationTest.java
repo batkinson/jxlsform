@@ -1,9 +1,6 @@
 package com.github.batkinson.jxlsform.poi;
 
-import com.github.batkinson.jxlsform.api.Settings;
-import com.github.batkinson.jxlsform.api.Workbook;
-import com.github.batkinson.jxlsform.api.XLSForm;
-import com.github.batkinson.jxlsform.api.XLSFormException;
+import com.github.batkinson.jxlsform.api.*;
 import com.github.batkinson.jxlsform.common.XLSFormFactory;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,6 +88,15 @@ public class XLSFormIntegrationTest {
                 .orElseThrow(() -> new XLSFormException("expected choice list1->value"))
                 .getLabel()
                 .orElse("choice label not present"));
+    }
+
+    @Test
+    public void testUsedChoicesXlsx() throws IOException {
+        for (SurveyItem item : form("usedchoices.xlsx").getSurvey()) {
+            assertTrue(item instanceof Select);
+            Select select = (Select) item;
+            assertTrue(select.getChoiceList().iterator().hasNext());
+        }
     }
 
     private void assertMinimal(XLSForm form) {

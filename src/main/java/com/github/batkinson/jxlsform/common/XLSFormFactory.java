@@ -11,6 +11,16 @@ import static java.util.stream.StreamSupport.stream;
 
 public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSFormFactory {
 
+    private com.github.batkinson.jxlsform.api.SurveyItemFactory itemFactory;
+
+    public XLSFormFactory() {
+        this(new SurveyItemFactory());
+    }
+
+    XLSFormFactory(SurveyItemFactory itemFactory) {
+        this.itemFactory = itemFactory;
+    }
+
     @Override
     public com.github.batkinson.jxlsform.api.XLSForm create(com.github.batkinson.jxlsform.api.Workbook workbook) {
         XLSForm form = new XLSForm(workbook);
@@ -61,10 +71,13 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
 
         stream(survey.getSheet().spliterator(), false)
                 .filter(row -> !row.isHeader())
-                .filter(row -> row.getCellByHeader("type").isPresent())
+                .filter(row -> row.getCellByHeader("type")
+                        .map(com.github.batkinson.jxlsform.api.Cell::getValue)
+                        .isPresent())
                 .forEachOrdered(row -> {
                     String type = row.getCellByHeader("type")
-                            .map(com.github.batkinson.jxlsform.api.Cell::getValue).orElse("");
+                            .map(com.github.batkinson.jxlsform.api.Cell::getValue)
+                            .orElse("");
                     switch (type) {
                         case "begin group":
                             groupStack.push(new Group(survey, groupStack.peek(), row));
@@ -87,7 +100,8 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
                             groupStack.peek().add(closedRepeat);
                             break;
                         default:
-                            groupStack.peek().add(new Question(survey, groupStack.peek(), row));
+                            itemFactory.create(survey, groupStack.peek(), row)
+                                    .ifPresent(item -> groupStack.peek().add(item));
                     }
                 });
 
