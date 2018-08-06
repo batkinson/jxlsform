@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoRule;
 import java.util.Optional;
 
 import static com.github.batkinson.jxlsform.api.XLSForm.*;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
@@ -69,5 +70,15 @@ public class XLSFormTest {
         assertNotNull(form.getSurvey());
         assertNotNull(form.getChoices());
         assertNotNull(form.getSettings());
+    }
+
+    @Test
+    public void testStandardSheets() {
+        asList("survey", "choices", "settings").forEach(s -> assertTrue(STANDARD_SHEETS.contains(s)));
+    }
+
+    @Test
+    public void testRequiredSheets() {
+        asList("survey", "choices").forEach(s -> assertTrue(STANDARD_SHEETS.contains(s)));
     }
 }
