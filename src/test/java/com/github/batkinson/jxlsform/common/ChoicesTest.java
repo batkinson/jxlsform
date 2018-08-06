@@ -27,21 +27,21 @@ public class ChoicesTest {
     public ExpectedException exceptionRule = ExpectedException.none();
 
     @Test
-    public void testCreateNoForm() {
+    public void createNoForm() {
         exceptionRule.expect(XLSFormException.class);
         exceptionRule.expectMessage("form is required");
         new Choices(null, mockSheet);
     }
 
     @Test
-    public void testCreateNoSheet() {
+    public void createNoSheet() {
         exceptionRule.expect(XLSFormException.class);
         exceptionRule.expectMessage("sheet is required");
         new Choices(mockForm, null);
     }
 
     @Test
-    public void testCreate() {
+    public void create() {
         Choices c = new Choices(mockForm, mockSheet);
         assertSame(mockForm, c.getForm());
         assertSame(mockSheet, c.getSheet());
