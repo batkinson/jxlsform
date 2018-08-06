@@ -12,8 +12,8 @@ import org.mockito.junit.MockitoRule;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 public class SettingsTest {
@@ -26,6 +26,9 @@ public class SettingsTest {
 
     @Mock
     private com.github.batkinson.jxlsform.api.Row row1, row2, row3;
+
+    @Mock
+    com.github.batkinson.jxlsform.api.Cell cell1;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -59,9 +62,68 @@ public class SettingsTest {
         when(mockSheet.spliterator()).thenReturn(asList(row1, row2, row3).spliterator());
         when(row1.isHeader()).thenReturn(true);
         when(row2.isHeader()).thenReturn(false);
-        when(row3.isHeader()).thenReturn(false);
         Optional<Row> maybeRow = new Settings(mockForm, mockSheet).getRow();
         assertTrue(maybeRow.isPresent());
         assertSame(row2, maybeRow.get());
+    }
+
+    @Test
+    public void getFormTitleNoCell() {
+        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(row1.isHeader()).thenReturn(false);
+        when(row1.getCellByHeader("form_title")).thenReturn(Optional.empty());
+        Settings s = new Settings(mockForm, mockSheet);
+        assertEquals(Optional.empty(), s.getFormTitle());
+    }
+
+    @Test
+    public void getFormTitle() {
+        String title = "a title";
+        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(row1.isHeader()).thenReturn(false);
+        when(row1.getCellByHeader("form_title")).thenReturn(Optional.of(cell1));
+        when(cell1.getValue()).thenReturn(title);
+        Settings s = new Settings(mockForm, mockSheet);
+        assertEquals(title, s.getFormTitle().orElse("no title found"));
+    }
+
+    @Test
+    public void getFormIdNoCell() {
+        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(row1.isHeader()).thenReturn(false);
+        when(row1.getCellByHeader("form_id")).thenReturn(Optional.empty());
+        Settings s = new Settings(mockForm, mockSheet);
+        assertEquals(Optional.empty(), s.getFormId());
+    }
+
+    @Test
+    public void getFormId() {
+        String id = "form id";
+        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(row1.isHeader()).thenReturn(false);
+        when(row1.getCellByHeader("form_id")).thenReturn(Optional.of(cell1));
+        when(cell1.getValue()).thenReturn(id);
+        Settings s = new Settings(mockForm, mockSheet);
+        assertEquals(id, s.getFormId().orElse("no form id found"));
+    }
+
+    @Test
+    public void getFormVersionNoCell() {
+        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(row1.isHeader()).thenReturn(false);
+        when(row1.getCellByHeader("form_version")).thenReturn(Optional.empty());
+        Settings s = new Settings(mockForm, mockSheet);
+        assertEquals(Optional.empty(), s.getFormVersion());
+    }
+
+    @Test
+    public void getFormVersion() {
+        String version = "form id";
+        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(row1.isHeader()).thenReturn(false);
+        when(row1.getCellByHeader("form_version")).thenReturn(Optional.of(cell1));
+        when(cell1.getValue()).thenReturn(version);
+        Settings s = new Settings(mockForm, mockSheet);
+        assertEquals(version, s.getFormVersion().orElse("no form version found"));
     }
 }
