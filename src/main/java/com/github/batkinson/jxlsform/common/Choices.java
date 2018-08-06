@@ -1,5 +1,7 @@
 package com.github.batkinson.jxlsform.common;
 
+import com.github.batkinson.jxlsform.api.XLSFormException;
+
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,6 +14,12 @@ public class Choices implements com.github.batkinson.jxlsform.api.Choices {
     private final Map<String, com.github.batkinson.jxlsform.api.ChoiceList> choices = new LinkedHashMap<>();
 
     Choices(com.github.batkinson.jxlsform.api.XLSForm form, com.github.batkinson.jxlsform.api.Sheet sheet) {
+        if (form == null) {
+            throw new XLSFormException("form is required");
+        }
+        if (sheet == null) {
+            throw new XLSFormException("sheet is required");
+        }
         this.form = form;
         this.sheet = sheet;
     }
