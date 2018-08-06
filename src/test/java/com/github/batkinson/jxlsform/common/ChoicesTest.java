@@ -10,7 +10,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class ChoicesTest {
 
@@ -45,5 +51,25 @@ public class ChoicesTest {
         Choices c = new Choices(mockForm, mockSheet);
         assertSame(mockForm, c.getForm());
         assertSame(mockSheet, c.getSheet());
+    }
+
+    @Test
+    public void getChoiceList() {
+        String listName = "alist";
+        Choices c = new Choices(mockForm, mockSheet);
+        assertFalse(c.getChoiceList(listName).isPresent());
+        c.addList(new ChoiceList(c, listName));
+        assertTrue(c.getChoiceList(listName).isPresent());
+    }
+
+    @Test
+    public void iterator() {
+        List<String> listNames = asList("list1", "list2");
+        Choices c = new Choices(mockForm, mockSheet);
+        List<ChoiceList> lists = listNames.stream().map(l -> new ChoiceList(c, l)).collect(Collectors.toList());
+        lists.forEach(c::addList);
+        listNames.forEach(ln -> {
+            assertTrue(c.getChoiceList(ln).isPresent() && ln.equals(c.getChoiceList(ln).get().getName()));
+        });
     }
 }
