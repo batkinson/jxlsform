@@ -115,4 +115,10 @@ public class SheetTest {
                         .getCell("A", 1)
                         .isPresent());
     }
+
+    @Test
+    public void toStringValue() {
+        String sheetName = "whatever";
+        assertEquals(String.format("%s sheet", sheetName), new Sheet(mockWb, sheetName).toString());
+    }
 }
