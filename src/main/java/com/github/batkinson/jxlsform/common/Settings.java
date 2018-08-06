@@ -2,6 +2,7 @@ package com.github.batkinson.jxlsform.common;
 
 
 import com.github.batkinson.jxlsform.api.Cell;
+import com.github.batkinson.jxlsform.api.XLSFormException;
 
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -12,6 +13,12 @@ public class Settings implements com.github.batkinson.jxlsform.api.Settings {
     private final com.github.batkinson.jxlsform.api.Sheet sheet;
 
     Settings(com.github.batkinson.jxlsform.api.XLSForm form, com.github.batkinson.jxlsform.api.Sheet sheet) {
+        if (form == null) {
+            throw new XLSFormException("form is required");
+        }
+        if (sheet == null) {
+            throw new XLSFormException("sheet is required");
+        }
         this.form = form;
         this.sheet = sheet;
     }
