@@ -12,6 +12,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static junit.framework.TestCase.assertFalse;
@@ -64,12 +65,13 @@ public class ChoicesTest {
 
     @Test
     public void iterator() {
-        List<String> listNames = asList("list1", "list2");
         Choices c = new Choices(mockForm, mockSheet);
-        List<ChoiceList> lists = listNames.stream().map(l -> new ChoiceList(c, l)).collect(Collectors.toList());
+        List<ChoiceList> lists = Stream.of("list1", "list2")
+                .map(l -> new ChoiceList(c, l))
+                .collect(Collectors.toList());
         lists.forEach(c::addList);
-        listNames.forEach(ln -> {
-            assertTrue(c.getChoiceList(ln).isPresent() && ln.equals(c.getChoiceList(ln).get().getName()));
-        });
+        assertFalse(lists.isEmpty());
+        c.forEach(lists::remove);
+        assertTrue(lists.isEmpty());
     }
 }
