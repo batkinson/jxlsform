@@ -10,6 +10,12 @@ public class Choice implements com.github.batkinson.jxlsform.api.Choice {
     private final com.github.batkinson.jxlsform.api.Row row;
 
     Choice(com.github.batkinson.jxlsform.api.ChoiceList list, com.github.batkinson.jxlsform.api.Row row) {
+        if (list == null) {
+            throw new XLSFormException("list is required");
+        }
+        if (row == null) {
+            throw new XLSFormException("row is required");
+        }
         this.list = list;
         this.row = row;
     }
