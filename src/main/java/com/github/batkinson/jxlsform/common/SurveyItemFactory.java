@@ -4,6 +4,7 @@ import com.github.batkinson.jxlsform.api.Row;
 import com.github.batkinson.jxlsform.api.Survey;
 import com.github.batkinson.jxlsform.api.SurveyItem;
 import com.github.batkinson.jxlsform.api.SurveyItemContainer;
+import com.github.batkinson.jxlsform.api.*;
 
 import java.util.Optional;
 
@@ -11,6 +12,9 @@ public class SurveyItemFactory implements com.github.batkinson.jxlsform.api.Surv
 
     @Override
     public Optional<SurveyItem> create(Survey survey, SurveyItemContainer parent, Row row) {
+        if (row == null) {
+            throw new XLSFormException("row is required");
+        }
         return row.getCellByHeader("type")
                 .map(com.github.batkinson.jxlsform.api.Cell::getValue)
                 .map(s -> s.split("\\s+"))
