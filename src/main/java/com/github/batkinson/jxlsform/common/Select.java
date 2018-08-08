@@ -17,9 +17,18 @@ public class Select extends Question implements com.github.batkinson.jxlsform.ap
 
     }
 
+    private String[] getSplitType() {
+        return super.getType().split("\\s+");
+    }
+
+    @Override
+    public String getType() {
+        return getSplitType()[0];
+    }
+
     @Override
     public String getListName() {
-        String[] type = getType().split("\\s+");
+        String[] type = getSplitType();
         if (type.length < 2) {
             throw new XLSFormException("choice list not specified: " + getRow());
         }
