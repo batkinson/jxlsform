@@ -26,6 +26,8 @@ public class SurveyItemFactory implements com.github.batkinson.jxlsform.api.Surv
                                     return new SelectMultiple(survey, parent, row);
                                 case "begin group":
                                     return new Group(survey, parent, row);
+                                case "begin repeat":
+                                    return new Repeat(survey, parent, row);
                                 default:
                                     return new Question(survey, parent, row);
                             }

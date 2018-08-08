@@ -142,4 +142,18 @@ public class SurveyItemFactoryTest {
         assertEquals("agroup", item.getName().orElse("no name"));
         assertTrue(item instanceof Group);
     }
+
+    @Test
+    public void repeat() {
+        when(row.getCellByHeader("type")).thenReturn(Optional.of(cell1));
+        when(row.getCellByHeader("name")).thenReturn(Optional.of(cell2));
+        when(cell1.getValue()).thenReturn("begin repeat");
+        when(cell2.getValue()).thenReturn("arepeat");
+        Optional<SurveyItem> maybeItem = factory.create(survey, container, row);
+        assertTrue(maybeItem.isPresent());
+        SurveyItem item = maybeItem.get();
+        assertEquals("begin repeat", item.getType());
+        assertEquals("arepeat", item.getName().orElse("no name"));
+        assertTrue(item instanceof Repeat);
+    }
 }
