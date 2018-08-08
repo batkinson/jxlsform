@@ -24,6 +24,8 @@ import static org.mockito.Mockito.when;
 
 public class SurveyItemFactoryTest {
 
+    private static String LIST_NAME = "list1";
+
     @Mock
     private XLSForm form;
 
@@ -94,36 +96,36 @@ public class SurveyItemFactoryTest {
     @Test
     public void selectOne() {
         when(row.getCellByHeader("type")).thenReturn(Optional.of(cell));
-        when(cell.getValue()).thenReturn("select_one list1");
+        when(cell.getValue()).thenReturn("select_one " + LIST_NAME);
         when(survey.getForm()).thenReturn(form);
         when(form.getChoices()).thenReturn(choices);
-        when(choices.getChoiceList("list1")).thenReturn(Optional.of(choiceList));
-        when(choiceList.getName()).thenReturn("list1");
+        when(choices.getChoiceList(LIST_NAME)).thenReturn(Optional.of(choiceList));
+        when(choiceList.getName()).thenReturn(LIST_NAME);
         Optional<SurveyItem> maybeItem = factory.create(survey, container, row);
         assertTrue(maybeItem.isPresent());
         SurveyItem item = maybeItem.get();
         assertEquals("select_one", item.getType());
         assertTrue(item instanceof SelectOne);
         SelectOne select = (SelectOne)item;
-        assertEquals("list1", select.getListName());
-        assertEquals("list1", select.getChoiceList().getName());
+        assertEquals(LIST_NAME, select.getListName());
+        assertEquals(LIST_NAME, select.getChoiceList().getName());
     }
 
     @Test
     public void selectMultiple() {
         when(row.getCellByHeader("type")).thenReturn(Optional.of(cell));
-        when(cell.getValue()).thenReturn("select_multiple list1");
+        when(cell.getValue()).thenReturn("select_multiple " + LIST_NAME);
         when(survey.getForm()).thenReturn(form);
         when(form.getChoices()).thenReturn(choices);
-        when(choices.getChoiceList("list1")).thenReturn(Optional.of(choiceList));
-        when(choiceList.getName()).thenReturn("list1");
+        when(choices.getChoiceList(LIST_NAME)).thenReturn(Optional.of(choiceList));
+        when(choiceList.getName()).thenReturn(LIST_NAME);
         Optional<SurveyItem> maybeItem = factory.create(survey, container, row);
         assertTrue(maybeItem.isPresent());
         SurveyItem item = maybeItem.get();
         assertEquals("select_multiple", item.getType());
         assertTrue(item instanceof SelectMultiple);
         SelectMultiple select = (SelectMultiple)item;
-        assertEquals("list1", select.getListName());
-        assertEquals("list1", select.getChoiceList().getName());
+        assertEquals(LIST_NAME, select.getListName());
+        assertEquals(LIST_NAME, select.getChoiceList().getName());
     }
 }
