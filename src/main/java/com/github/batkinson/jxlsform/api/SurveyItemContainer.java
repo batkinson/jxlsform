@@ -1,4 +1,4 @@
 package com.github.batkinson.jxlsform.api;
 
-public interface SurveyItemContainer extends Iterable<SurveyItem> {
+public interface SurveyItemContainer extends Streamable<SurveyItem> {
 }

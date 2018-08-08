@@ -2,7 +2,7 @@ package com.github.batkinson.jxlsform.api;
 
 import java.util.Optional;
 
-public interface Sheet extends Iterable<Row> {
+public interface Sheet extends Streamable<Row> {
 
     Workbook getWorkbook();
 

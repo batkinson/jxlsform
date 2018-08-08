@@ -2,7 +2,7 @@ package com.github.batkinson.jxlsform.api;
 
 import java.util.Optional;
 
-public interface Choices extends Iterable<ChoiceList> {
+public interface Choices extends Streamable<ChoiceList> {
 
     XLSForm getForm();
 
