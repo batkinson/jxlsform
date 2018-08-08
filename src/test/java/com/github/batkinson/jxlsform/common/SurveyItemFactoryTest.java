@@ -45,7 +45,7 @@ public class SurveyItemFactoryTest {
     private Row row;
 
     @Mock
-    private Cell cell;
+    private Cell cell1, cell2;
 
     private SurveyItemFactory factory;
 
@@ -85,8 +85,8 @@ public class SurveyItemFactoryTest {
 
     @Test
     public void unknownType() {
-        when(row.getCellByHeader("type")).thenReturn(Optional.of(cell));
-        when(cell.getValue()).thenReturn("unknown");
+        when(row.getCellByHeader("type")).thenReturn(Optional.of(cell1));
+        when(cell1.getValue()).thenReturn("unknown");
         Optional<SurveyItem> maybeItem = factory.create(survey, container, row);
         assertTrue(maybeItem.isPresent());
         SurveyItem item = maybeItem.get();
@@ -95,8 +95,8 @@ public class SurveyItemFactoryTest {
 
     @Test
     public void selectOne() {
-        when(row.getCellByHeader("type")).thenReturn(Optional.of(cell));
-        when(cell.getValue()).thenReturn("select_one " + LIST_NAME);
+        when(row.getCellByHeader("type")).thenReturn(Optional.of(cell1));
+        when(cell1.getValue()).thenReturn("select_one " + LIST_NAME);
         when(survey.getForm()).thenReturn(form);
         when(form.getChoices()).thenReturn(choices);
         when(choices.getChoiceList(LIST_NAME)).thenReturn(Optional.of(choiceList));
@@ -113,8 +113,8 @@ public class SurveyItemFactoryTest {
 
     @Test
     public void selectMultiple() {
-        when(row.getCellByHeader("type")).thenReturn(Optional.of(cell));
-        when(cell.getValue()).thenReturn("select_multiple " + LIST_NAME);
+        when(row.getCellByHeader("type")).thenReturn(Optional.of(cell1));
+        when(cell1.getValue()).thenReturn("select_multiple " + LIST_NAME);
         when(survey.getForm()).thenReturn(form);
         when(form.getChoices()).thenReturn(choices);
         when(choices.getChoiceList(LIST_NAME)).thenReturn(Optional.of(choiceList));
@@ -127,5 +127,19 @@ public class SurveyItemFactoryTest {
         SelectMultiple select = (SelectMultiple)item;
         assertEquals(LIST_NAME, select.getListName());
         assertEquals(LIST_NAME, select.getChoiceList().getName());
+    }
+
+    @Test
+    public void group() {
+        when(row.getCellByHeader("type")).thenReturn(Optional.of(cell1));
+        when(row.getCellByHeader("name")).thenReturn(Optional.of(cell2));
+        when(cell1.getValue()).thenReturn("begin group");
+        when(cell2.getValue()).thenReturn("agroup");
+        Optional<SurveyItem> maybeItem = factory.create(survey, container, row);
+        assertTrue(maybeItem.isPresent());
+        SurveyItem item = maybeItem.get();
+        assertEquals("begin group", item.getType());
+        assertEquals("agroup", item.getName().orElse("no name"));
+        assertTrue(item instanceof Group);
     }
 }
