@@ -17,7 +17,7 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
         this(new SurveyItemFactory());
     }
 
-    XLSFormFactory(SurveyItemFactory itemFactory) {
+    XLSFormFactory(com.github.batkinson.jxlsform.api.SurveyItemFactory itemFactory) {
         this.itemFactory = itemFactory;
     }
 
