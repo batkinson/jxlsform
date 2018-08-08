@@ -11,6 +11,16 @@ import java.util.Optional;
 public class SurveyItemFactory implements com.github.batkinson.jxlsform.api.SurveyItemFactory {
 
     @Override
+    public com.github.batkinson.jxlsform.api.Group createGroup(Survey survey, SurveyItemContainer parent, Row row) {
+        return new Group(survey, parent, row);
+    }
+
+    @Override
+    public com.github.batkinson.jxlsform.api.Repeat createRepeat(Survey survey, SurveyItemContainer parent, Row row) {
+        return new Repeat(survey, parent, row);
+    }
+
+    @Override
     public Optional<SurveyItem> create(Survey survey, SurveyItemContainer parent, Row row) {
         if (row == null) {
             throw new XLSFormException("row is required");
@@ -25,9 +35,9 @@ public class SurveyItemFactory implements com.github.batkinson.jxlsform.api.Surv
                                 case "select_multiple":
                                     return new SelectMultiple(survey, parent, row);
                                 case "begin group":
-                                    return new Group(survey, parent, row);
+                                    return createGroup(survey, parent, row);
                                 case "begin repeat":
-                                    return new Repeat(survey, parent, row);
+                                    return createRepeat(survey, parent, row);
                                 default:
                                     return new Question(survey, parent, row);
                             }

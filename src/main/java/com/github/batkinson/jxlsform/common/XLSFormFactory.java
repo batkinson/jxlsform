@@ -77,24 +77,22 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
                             .ifPresent(type -> {
                                 switch (type) {
                                     case "begin group":
-                                        groupStack.push(new Group(survey, groupStack.peek(), row));
+                                        groupStack.push((SurveyItemContainer) itemFactory.createGroup(survey, groupStack.peek(), row));
                                         break;
                                     case "end group":
-                                        if (!(groupStack.peek() instanceof Group)) {
+                                        if (!(groupStack.peek() instanceof com.github.batkinson.jxlsform.api.Group)) {
                                             throw new XLSFormException("unexpected 'end group', " + row);
                                         }
-                                        Group closedGroup = (Group) groupStack.pop();
-                                        groupStack.peek().add(closedGroup);
+                                        groupStack.peek().add((com.github.batkinson.jxlsform.api.Group) groupStack.pop());
                                         break;
                                     case "begin repeat":
-                                        groupStack.push(new Repeat(survey, groupStack.peek(), row));
+                                        groupStack.push((SurveyItemContainer) itemFactory.createRepeat(survey, groupStack.peek(), row));
                                         break;
                                     case "end repeat":
-                                        if (!(groupStack.peek() instanceof Repeat)) {
+                                        if (!(groupStack.peek() instanceof com.github.batkinson.jxlsform.api.Repeat)) {
                                             throw new XLSFormException("unexpected 'end repeat', " + row);
                                         }
-                                        Repeat closedRepeat = (Repeat) groupStack.pop();
-                                        groupStack.peek().add(closedRepeat);
+                                        groupStack.peek().add((com.github.batkinson.jxlsform.api.Repeat) groupStack.pop());
                                         break;
                                     default:
                                         itemFactory.create(survey, groupStack.peek(), row)
