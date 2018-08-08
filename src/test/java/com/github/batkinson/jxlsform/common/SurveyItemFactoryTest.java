@@ -62,35 +62,39 @@ public class SurveyItemFactoryTest {
 
     @Test
     public void createNoSurvey() {
-        assertEquals(Optional.empty(), factory.create(null, container, row));
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("survey is required");
+        factory.create(null, container, row);
     }
 
     @Test
     public void createNoParent() {
-        assertEquals(Optional.empty(), factory.create(survey, null, row));
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("parent is required");
+        factory.create(survey, null, row);
     }
 
     @Test
     public void createNoRow() {
         exceptionRule.expect(XLSFormException.class);
         exceptionRule.expectMessage("row is required");
-        assertEquals(Optional.empty(), factory.create(survey, container, null));
+        factory.create(survey, container, null);
     }
 
     @Test
     public void createNoType() {
-        when(row.getCellByHeader("type")).thenReturn(Optional.empty());
-        assertEquals(Optional.empty(), factory.create(survey, container, row));
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("type is required");
+        factory.create(survey, container, row);
     }
 
     @Test
     public void unknownType() {
+        String type = "unknown";
+        exceptionRule.expect(XLSFormException.class);
+        exceptionRule.expectMessage("unknown type '"+ type + "'");
         when(row.getCellByHeader("type")).thenReturn(Optional.of(cell1));
-        when(cell1.getValue()).thenReturn("unknown");
-        Optional<SurveyItem> maybeItem = factory.create(survey, container, row);
-        assertTrue(maybeItem.isPresent());
-        SurveyItem item = maybeItem.get();
-        assertEquals("unknown", item.getType());
+        when(cell1.getValue()).thenReturn(type);factory.create(survey, container, row);
     }
 
     @Test
@@ -101,9 +105,7 @@ public class SurveyItemFactoryTest {
         when(form.getChoices()).thenReturn(choices);
         when(choices.getChoiceList(LIST_NAME)).thenReturn(Optional.of(choiceList));
         when(choiceList.getName()).thenReturn(LIST_NAME);
-        Optional<SurveyItem> maybeItem = factory.create(survey, container, row);
-        assertTrue(maybeItem.isPresent());
-        SurveyItem item = maybeItem.get();
+        SurveyItem item = factory.create(survey, container, row);
         assertEquals("select_one", item.getType());
         assertTrue(item instanceof SelectOne);
         SelectOne select = (SelectOne)item;
@@ -119,9 +121,7 @@ public class SurveyItemFactoryTest {
         when(form.getChoices()).thenReturn(choices);
         when(choices.getChoiceList(LIST_NAME)).thenReturn(Optional.of(choiceList));
         when(choiceList.getName()).thenReturn(LIST_NAME);
-        Optional<SurveyItem> maybeItem = factory.create(survey, container, row);
-        assertTrue(maybeItem.isPresent());
-        SurveyItem item = maybeItem.get();
+        SurveyItem item = factory.create(survey, container, row);
         assertEquals("select_multiple", item.getType());
         assertTrue(item instanceof SelectMultiple);
         SelectMultiple select = (SelectMultiple)item;
@@ -135,9 +135,7 @@ public class SurveyItemFactoryTest {
         when(row.getCellByHeader("name")).thenReturn(Optional.of(cell2));
         when(cell1.getValue()).thenReturn("begin group");
         when(cell2.getValue()).thenReturn("agroup");
-        Optional<SurveyItem> maybeItem = factory.create(survey, container, row);
-        assertTrue(maybeItem.isPresent());
-        SurveyItem item = maybeItem.get();
+        SurveyItem item = factory.create(survey, container, row);
         assertEquals("begin group", item.getType());
         assertEquals("agroup", item.getName().orElse("no name"));
         assertTrue(item instanceof Group);
@@ -149,9 +147,7 @@ public class SurveyItemFactoryTest {
         when(row.getCellByHeader("name")).thenReturn(Optional.of(cell2));
         when(cell1.getValue()).thenReturn("begin repeat");
         when(cell2.getValue()).thenReturn("arepeat");
-        Optional<SurveyItem> maybeItem = factory.create(survey, container, row);
-        assertTrue(maybeItem.isPresent());
-        SurveyItem item = maybeItem.get();
+        SurveyItem item = factory.create(survey, container, row);
         assertEquals("begin repeat", item.getType());
         assertEquals("arepeat", item.getName().orElse("no name"));
         assertTrue(item instanceof Repeat);

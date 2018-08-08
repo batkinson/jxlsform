@@ -6,8 +6,6 @@ import com.github.batkinson.jxlsform.api.SurveyItem;
 import com.github.batkinson.jxlsform.api.SurveyItemContainer;
 import com.github.batkinson.jxlsform.api.*;
 
-import java.util.Optional;
-
 public class SurveyItemFactory implements com.github.batkinson.jxlsform.api.SurveyItemFactory {
 
     @Override
@@ -21,7 +19,13 @@ public class SurveyItemFactory implements com.github.batkinson.jxlsform.api.Surv
     }
 
     @Override
-    public Optional<SurveyItem> create(Survey survey, SurveyItemContainer parent, Row row) {
+    public SurveyItem create(Survey survey, SurveyItemContainer parent, Row row) {
+        if (survey == null) {
+            throw new XLSFormException("survey is required");
+        }
+        if (parent == null) {
+            throw new XLSFormException("parent is required");
+        }
         if (row == null) {
             throw new XLSFormException("row is required");
         }
@@ -38,11 +42,14 @@ public class SurveyItemFactory implements com.github.batkinson.jxlsform.api.Surv
                                     return createGroup(survey, parent, row);
                                 case "begin repeat":
                                     return createRepeat(survey, parent, row);
-                                default:
+                                case "text":
                                     return new Question(survey, parent, row);
+                                default:
+                                    throw new XLSFormException("unknown type '" + t[0] + "'");
                             }
                         }
-                );
+                )
+                .orElseThrow(() -> new XLSFormException("type is required"));
     }
 
 }

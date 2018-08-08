@@ -95,8 +95,7 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
                                         groupStack.peek().add((com.github.batkinson.jxlsform.api.Repeat) groupStack.pop());
                                         break;
                                     default:
-                                        itemFactory.create(survey, groupStack.peek(), row)
-                                                .ifPresent(item -> groupStack.peek().add(item));
+                                        groupStack.peek().add(itemFactory.create(survey, groupStack.peek(), row));
                                 }
                             });
                 });
