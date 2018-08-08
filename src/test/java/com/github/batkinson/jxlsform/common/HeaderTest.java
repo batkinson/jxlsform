@@ -8,6 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.lang.reflect.Field;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 import static junit.framework.TestCase.assertTrue;
@@ -49,7 +52,63 @@ public class HeaderTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void getCellByHeaderCaches() throws NoSuchFieldException, IllegalAccessException {
+
+        CacheTestHeader header = new CacheTestHeader(mockSheet, 1);
+
+        Map<String, Cell> headerCache = header.getCache();
+
+        when(mockSheet.getHeader()).thenReturn(header);
+        header.addCell("A", Cell.Type.STRING, "happy");
+        header.addCell("B", Cell.Type.STRING, "go");
+        header.addCell("D", Cell.Type.STRING, "lucky");
+
+        // ensure the items aren't in cache prior to lookup
+        header.forEach(c -> assertFalse(headerCache.containsKey(c.getName())));
+
+        // lookup the existing cells by header name
+        header.forEach(c -> assertTrue(header.getCellByHeader(c.getName()).isPresent()));
+
+        // ensure existing items are in cache after lookup
+        header.forEach(c -> assertTrue(headerCache.containsKey(c.getName())));
+
+        // ensure the cache items are used
+        header.forEach(c -> {
+            header.blockIteration = true;
+            assertTrue(header.getCellByHeader(c.getName()).isPresent());
+            header.blockIteration = false;
+        });
+    }
+
+    @Test
     public void testToString() {
         assertEquals("header, row 1", new Header(mockSheet, 1).toString());
+    }
+}
+
+
+class CacheTestHeader extends Header {
+
+    boolean blockIteration = false;
+
+    CacheTestHeader(Sheet sheet, int rowNumber) {
+        super(sheet, rowNumber);
+    }
+
+    @SuppressWarnings("unchecked")
+    Map<String, Cell> getCache() throws NoSuchFieldException, IllegalAccessException {
+        Field ncf = Header.class.getDeclaredField("namedCells");
+        ncf.setAccessible(true);
+        return (Map<String, Cell>) ncf.get(this);
+    }
+
+    @Override
+    public Iterator<com.github.batkinson.jxlsform.api.Cell> iterator() {
+        if (blockIteration) {
+            throw new RuntimeException("iteration should not occur");
+        } else {
+            return super.iterator();
+        }
     }
 }
