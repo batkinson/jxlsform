@@ -42,10 +42,8 @@ public class SurveyItemFactory implements com.github.batkinson.jxlsform.api.Surv
                                     return createGroup(survey, parent, row);
                                 case "begin repeat":
                                     return createRepeat(survey, parent, row);
-                                case "text":
-                                    return new Question(survey, parent, row);
                                 default:
-                                    throw new XLSFormException("unknown type '" + t[0] + "'");
+                                    return new Question(survey, parent, row);
                             }
                         }
                 )

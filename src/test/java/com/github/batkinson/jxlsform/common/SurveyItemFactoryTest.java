@@ -7,7 +7,7 @@ import com.github.batkinson.jxlsform.api.Row;
 import com.github.batkinson.jxlsform.api.SurveyItem;
 import com.github.batkinson.jxlsform.api.SurveyItemContainer;
 import com.github.batkinson.jxlsform.api.XLSForm;
-import com.github.batkinson.jxlsform.api.XLSFormException;
+import com.github.batkinson.jxlsform.api.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,10 +91,10 @@ public class SurveyItemFactoryTest {
     @Test
     public void unknownType() {
         String type = "unknown";
-        exceptionRule.expect(XLSFormException.class);
-        exceptionRule.expectMessage("unknown type '"+ type + "'");
         when(row.getCellByHeader("type")).thenReturn(Optional.of(cell1));
-        when(cell1.getValue()).thenReturn(type);factory.create(survey, container, row);
+        when(cell1.getValue()).thenReturn(type);
+        SurveyItem item = factory.create(survey, container, row);
+        assertEquals(Question.class, item.getClass());
     }
 
     @Test
