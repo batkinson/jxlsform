@@ -1,16 +1,14 @@
 package com.github.batkinson.jxlsform.poi;
 
 import com.github.batkinson.jxlsform.api.*;
-import com.github.batkinson.jxlsform.common.XLSFormFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import static com.github.batkinson.jxlsform.api.XLSForm.*;
+import static com.github.batkinson.jxlsform.poi.FormLoader.getForm;
 import static org.junit.Assert.*;
 
 public class XLSFormIntegrationTest {
@@ -18,70 +16,65 @@ public class XLSFormIntegrationTest {
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 
-    @Test(expected = XLSFormException.class)
-    public void createWithBadStream() {
-        new WorkbookFactory().create(new ByteArrayInputStream(new byte[]{}));
-    }
-
     @Test
     public void testSimpleXls() throws IOException {
-        assertMinimal(form("simplest.xls"));
+        assertMinimal(getForm("simplest.xls"));
     }
 
     @Test
     public void testSimpleXlsx() throws IOException {
-        assertMinimal(form("simplest.xlsx"));
+        assertMinimal(getForm("simplest.xlsx"));
     }
 
     @Test
     public void testAllSheetsXls() throws IOException {
-        assertAllSheets(form("allsheets.xls"));
+        assertAllSheets(getForm("allsheets.xls"));
     }
 
     @Test
     public void testAllSheetsXlsx() throws IOException {
-        assertAllSheets(form("allsheets.xlsx"));
+        assertAllSheets(getForm("allsheets.xlsx"));
     }
 
     @Test
     public void testGroupsXlsx() throws IOException {
-        assertMinimal(form("groups.xlsx"));
+        assertMinimal(getForm("groups.xlsx"));
     }
 
     @Test
     public void testRepeatsXlsx() throws IOException {
-        assertMinimal(form("repeats.xlsx"));
+        assertMinimal(getForm("repeats.xlsx"));
     }
 
     @Test
     public void testGroupsAndRepeatsXlsx() throws IOException {
-        assertMinimal(form("groupsandrepeats.xlsx"));
+        assertMinimal(getForm("groupsandrepeats.xlsx"));
     }
 
     @Test
     public void testUnclosedGroupXlsx() throws IOException {
         exceptionRule.expect(XLSFormException.class);
         exceptionRule.expectMessage("unclosed group or repeat 'group1', (survey sheet, row 2)");
-        form("unclosedgroup.xlsx");
+        getForm("unclosedgroup.xlsx");
     }
 
     @Test
     public void testEarlyEndGroupXlsx() throws IOException {
         exceptionRule.expect(XLSFormException.class);
         exceptionRule.expectMessage("unexpected 'end group', row 3");
-        form("earlyendgroup.xlsx");
+        getForm("earlyendgroup.xlsx");
     }
 
     @Test
     public void testEarlyEndRepeatXlsx() throws IOException {
         exceptionRule.expect(XLSFormException.class);
         exceptionRule.expectMessage("unexpected 'end repeat', row 3");
-        form("earlyendrepeat.xlsx");
+        getForm("earlyendrepeat.xlsx");
     }
 
     @Test
     public void testChoicesXlsx() throws IOException {
-        assertEquals("label", form("choices.xlsx")
+        assertEquals("label", getForm("choices.xlsx")
                 .getChoices()
                 .getChoiceList("list1")
                 .flatMap(list -> list.getChoice("value"))
@@ -92,7 +85,7 @@ public class XLSFormIntegrationTest {
 
     @Test
     public void testUsedChoicesXlsx() throws IOException {
-        for (SurveyItem item : form("usedchoices.xlsx").getSurvey()) {
+        for (SurveyItem item : getForm("usedchoices.xlsx").getSurvey()) {
             assertTrue(item instanceof Select);
             Select select = (Select) item;
             assertTrue(select.getChoiceList().iterator().hasNext());
@@ -125,12 +118,5 @@ public class XLSFormIntegrationTest {
         assertMinimalHeaders(form);
         assertNotNull(form.getSettings().map(Settings::getSheet).orElseThrow(
                 () -> new RuntimeException("expected settings sheet to exist")).getHeader());
-    }
-
-    private XLSForm form(String fileName) throws IOException {
-        String dir = fileName.endsWith(".xls") ? "/xls" : "/xlsx";
-        try (InputStream stream = XLSFormIntegrationTest.class.getResourceAsStream(String.join("/", dir, fileName))) {
-            return new XLSFormFactory().create(new WorkbookFactory().create(stream));
-        }
     }
 }
