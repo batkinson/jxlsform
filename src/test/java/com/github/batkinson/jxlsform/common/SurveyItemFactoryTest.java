@@ -108,7 +108,7 @@ public class SurveyItemFactoryTest {
         SurveyItem item = factory.create(survey, container, row);
         assertEquals("select_one", item.getType());
         assertTrue(item instanceof SelectOne);
-        SelectOne select = (SelectOne)item;
+        SelectOne select = (SelectOne) item;
         assertEquals(LIST_NAME, select.getListName());
         assertEquals(LIST_NAME, select.getChoiceList().getName());
     }
@@ -124,7 +124,7 @@ public class SurveyItemFactoryTest {
         SurveyItem item = factory.create(survey, container, row);
         assertEquals("select_multiple", item.getType());
         assertTrue(item instanceof SelectMultiple);
-        SelectMultiple select = (SelectMultiple)item;
+        SelectMultiple select = (SelectMultiple) item;
         assertEquals(LIST_NAME, select.getListName());
         assertEquals(LIST_NAME, select.getChoiceList().getName());
     }
