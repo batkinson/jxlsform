@@ -71,38 +71,36 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
 
         stream(survey.getSheet().spliterator(), false)
                 .filter(row -> !row.isHeader())
-                .filter(row -> row.getCellByHeader("type")
-                        .map(com.github.batkinson.jxlsform.api.Cell::getValue)
-                        .isPresent())
                 .forEachOrdered(row -> {
-                    String type = row.getCellByHeader("type")
+                    row.getCellByHeader("type")
                             .map(com.github.batkinson.jxlsform.api.Cell::getValue)
-                            .orElse("");
-                    switch (type) {
-                        case "begin group":
-                            groupStack.push(new Group(survey, groupStack.peek(), row));
-                            break;
-                        case "end group":
-                            if (!(groupStack.peek() instanceof Group)) {
-                                throw new XLSFormException("unexpected 'end group', " + row);
-                            }
-                            Group closedGroup = (Group) groupStack.pop();
-                            groupStack.peek().add(closedGroup);
-                            break;
-                        case "begin repeat":
-                            groupStack.push(new Repeat(survey, groupStack.peek(), row));
-                            break;
-                        case "end repeat":
-                            if (!(groupStack.peek() instanceof Repeat)) {
-                                throw new XLSFormException("unexpected 'end repeat', " + row);
-                            }
-                            Repeat closedRepeat = (Repeat) groupStack.pop();
-                            groupStack.peek().add(closedRepeat);
-                            break;
-                        default:
-                            itemFactory.create(survey, groupStack.peek(), row)
-                                    .ifPresent(item -> groupStack.peek().add(item));
-                    }
+                            .ifPresent(type -> {
+                                switch (type) {
+                                    case "begin group":
+                                        groupStack.push(new Group(survey, groupStack.peek(), row));
+                                        break;
+                                    case "end group":
+                                        if (!(groupStack.peek() instanceof Group)) {
+                                            throw new XLSFormException("unexpected 'end group', " + row);
+                                        }
+                                        Group closedGroup = (Group) groupStack.pop();
+                                        groupStack.peek().add(closedGroup);
+                                        break;
+                                    case "begin repeat":
+                                        groupStack.push(new Repeat(survey, groupStack.peek(), row));
+                                        break;
+                                    case "end repeat":
+                                        if (!(groupStack.peek() instanceof Repeat)) {
+                                            throw new XLSFormException("unexpected 'end repeat', " + row);
+                                        }
+                                        Repeat closedRepeat = (Repeat) groupStack.pop();
+                                        groupStack.peek().add(closedRepeat);
+                                        break;
+                                    default:
+                                        itemFactory.create(survey, groupStack.peek(), row)
+                                                .ifPresent(item -> groupStack.peek().add(item));
+                                }
+                            });
                 });
 
         if (groupStack.size() > 1) {
