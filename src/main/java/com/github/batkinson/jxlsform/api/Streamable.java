@@ -6,7 +6,7 @@ import java.util.stream.StreamSupport;
 public interface Streamable<T> extends Iterable<T> {
 
     default Stream<T> stream() {
-        return StreamSupport.stream(this.spliterator(), false);
+        return StreamSupport.stream(spliterator(), false);
     }
 
 }
