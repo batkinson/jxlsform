@@ -11,7 +11,6 @@ import org.mockito.junit.MockitoRule;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
@@ -57,7 +56,7 @@ public class SheetTest {
         Iterator<com.github.batkinson.jxlsform.api.Row> iter = sheet.iterator();
         assertSame(row, iter.next());
         assertFalse("expected only the row added", iter.hasNext());
-        StreamSupport.stream(sheet.spliterator(), false)
+        sheet.stream()
                 .filter(r -> !r.isHeader())
                 .forEach(r -> fail("data should be empty"));
     }

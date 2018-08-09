@@ -10,6 +10,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -59,7 +60,7 @@ public class SettingsTest {
 
     @Test
     public void getRow() {
-        when(mockSheet.spliterator()).thenReturn(asList(row1, row2, row3).spliterator());
+        when(mockSheet.stream()).thenReturn(Stream.of(row1, row2, row3));
         when(row1.isHeader()).thenReturn(true);
         when(row2.isHeader()).thenReturn(false);
         Optional<Row> maybeRow = new Settings(mockForm, mockSheet).getRow();
@@ -69,7 +70,7 @@ public class SettingsTest {
 
     @Test
     public void getFormTitleNoCell() {
-        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(mockSheet.stream()).thenReturn(Stream.of(row1));
         when(row1.isHeader()).thenReturn(false);
         when(row1.getCellByHeader("form_title")).thenReturn(Optional.empty());
         Settings s = new Settings(mockForm, mockSheet);
@@ -79,7 +80,7 @@ public class SettingsTest {
     @Test
     public void getFormTitle() {
         String title = "a title";
-        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(mockSheet.stream()).thenReturn(Stream.of(row1));
         when(row1.isHeader()).thenReturn(false);
         when(row1.getCellByHeader("form_title")).thenReturn(Optional.of(cell1));
         when(cell1.getValue()).thenReturn(title);
@@ -89,7 +90,7 @@ public class SettingsTest {
 
     @Test
     public void getFormIdNoCell() {
-        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(mockSheet.stream()).thenReturn(Stream.of(row1));
         when(row1.isHeader()).thenReturn(false);
         when(row1.getCellByHeader("form_id")).thenReturn(Optional.empty());
         Settings s = new Settings(mockForm, mockSheet);
@@ -99,7 +100,7 @@ public class SettingsTest {
     @Test
     public void getFormId() {
         String id = "form id";
-        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(mockSheet.stream()).thenReturn(Stream.of(row1));
         when(row1.isHeader()).thenReturn(false);
         when(row1.getCellByHeader("form_id")).thenReturn(Optional.of(cell1));
         when(cell1.getValue()).thenReturn(id);
@@ -109,7 +110,7 @@ public class SettingsTest {
 
     @Test
     public void getFormVersionNoCell() {
-        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(mockSheet.stream()).thenReturn(Stream.of(row1));
         when(row1.isHeader()).thenReturn(false);
         when(row1.getCellByHeader("form_version")).thenReturn(Optional.empty());
         Settings s = new Settings(mockForm, mockSheet);
@@ -119,7 +120,7 @@ public class SettingsTest {
     @Test
     public void getFormVersion() {
         String version = "form id";
-        when(mockSheet.spliterator()).thenReturn(singletonList(row1).spliterator());
+        when(mockSheet.stream()).thenReturn(Stream.of(row1));
         when(row1.isHeader()).thenReturn(false);
         when(row1.getCellByHeader("form_version")).thenReturn(Optional.of(cell1));
         when(cell1.getValue()).thenReturn(version);

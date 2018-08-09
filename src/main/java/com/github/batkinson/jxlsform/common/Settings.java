@@ -5,7 +5,6 @@ import com.github.batkinson.jxlsform.api.Cell;
 import com.github.batkinson.jxlsform.api.XLSFormException;
 
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 public class Settings implements com.github.batkinson.jxlsform.api.Settings {
 
@@ -35,7 +34,7 @@ public class Settings implements com.github.batkinson.jxlsform.api.Settings {
 
     @Override
     public Optional<com.github.batkinson.jxlsform.api.Row> getRow() {
-        return StreamSupport.stream(sheet.spliterator(), false)
+        return sheet.stream()
                 .filter(row -> !row.isHeader())
                 .findFirst();
     }

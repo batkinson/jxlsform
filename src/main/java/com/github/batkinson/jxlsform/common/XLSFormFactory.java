@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Stream;
 
-import static java.util.stream.StreamSupport.stream;
-
 public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSFormFactory {
 
     private com.github.batkinson.jxlsform.api.SurveyItemFactory itemFactory;
@@ -37,7 +35,8 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
         Map<String, ChoiceList> lists = new LinkedHashMap<>();
 
         // construct the choice lists
-        stream(choices.getSheet().spliterator(), false)
+        choices.getSheet()
+                .stream()
                 .filter(row -> !row.isHeader())
                 .map(row -> row.getCellByHeader("list_name"))
                 .flatMap(cell -> cell.map(com.github.batkinson.jxlsform.api.Cell::getValue)
@@ -51,7 +50,8 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
                 });
 
         // add the choices
-        stream(choices.getSheet().spliterator(), false)
+        choices.getSheet()
+                .stream()
                 .filter(row -> !row.isHeader())
                 .filter(row -> row.getCellByHeader("list_name")
                         .map(com.github.batkinson.jxlsform.api.Cell::getValue).isPresent())
@@ -69,7 +69,8 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
         Stack<SurveyItemContainer> groupStack = new Stack<>();
         groupStack.push(survey);
 
-        stream(survey.getSheet().spliterator(), false)
+        survey.getSheet()
+                .stream()
                 .filter(row -> !row.isHeader())
                 .forEachOrdered(row -> {
                     row.getCellByHeader("type")
