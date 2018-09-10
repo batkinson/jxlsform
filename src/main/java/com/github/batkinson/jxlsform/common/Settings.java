@@ -57,7 +57,7 @@ public class Settings implements com.github.batkinson.jxlsform.api.Settings {
     @Override
     public Optional<String> getFormVersion() {
         return getRow()
-                .flatMap(row -> row.getCellByHeader("form_version"))
+                .flatMap(row -> row.getCellByHeader("version"))
                 .map(Cell::getValue);
     }
 }

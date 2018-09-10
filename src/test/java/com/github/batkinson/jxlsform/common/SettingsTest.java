@@ -110,7 +110,7 @@ public class SettingsTest {
     public void getFormVersionNoCell() {
         when(mockSheet.stream()).thenReturn(Stream.of(row1));
         when(row1.isHeader()).thenReturn(false);
-        when(row1.getCellByHeader("form_version")).thenReturn(Optional.empty());
+        when(row1.getCellByHeader("version")).thenReturn(Optional.empty());
         Settings s = new Settings(mockForm, mockSheet);
         assertEquals(Optional.empty(), s.getFormVersion());
     }
@@ -120,7 +120,7 @@ public class SettingsTest {
         String version = "form id";
         when(mockSheet.stream()).thenReturn(Stream.of(row1));
         when(row1.isHeader()).thenReturn(false);
-        when(row1.getCellByHeader("form_version")).thenReturn(Optional.of(cell1));
+        when(row1.getCellByHeader("version")).thenReturn(Optional.of(cell1));
         when(cell1.getValue()).thenReturn(version);
         Settings s = new Settings(mockForm, mockSheet);
         assertEquals(version, s.getFormVersion().orElse("no form version found"));
