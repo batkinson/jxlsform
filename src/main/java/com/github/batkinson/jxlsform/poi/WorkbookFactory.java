@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 
 import static org.apache.poi.ss.util.CellReference.convertNumToColString;
 
@@ -39,6 +40,7 @@ public class WorkbookFactory implements com.github.batkinson.jxlsform.api.Workbo
     }
 
     private static String translateValue(Cell cell) {
-        return cell.toString();
+        return cell.getCellTypeEnum() == CellType.NUMERIC ?
+                BigDecimal.valueOf(cell.getNumericCellValue()).stripTrailingZeros().toString() : cell.toString();
     }
 }
