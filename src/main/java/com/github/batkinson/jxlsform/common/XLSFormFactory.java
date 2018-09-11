@@ -40,6 +40,7 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
                 .filter(row -> !row.isHeader())
                 .map(row -> row.getCellByHeader("list_name"))
                 .flatMap(cell -> cell.map(com.github.batkinson.jxlsform.api.Cell::getValue)
+                        .filter(v -> !v.trim().isEmpty())
                         .map(Stream::of)
                         .orElseGet(Stream::empty))
                 .distinct()
@@ -54,7 +55,9 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
                 .stream()
                 .filter(row -> !row.isHeader())
                 .filter(row -> row.getCellByHeader("list_name")
-                        .map(com.github.batkinson.jxlsform.api.Cell::getValue).isPresent())
+                        .map(com.github.batkinson.jxlsform.api.Cell::getValue)
+                        .filter(v -> !v.trim().isEmpty())
+                        .isPresent())
                 .forEachOrdered(row -> {
                     String listName = row.getCellByHeader("list_name")
                             .map(com.github.batkinson.jxlsform.api.Cell::getValue).orElse("");
