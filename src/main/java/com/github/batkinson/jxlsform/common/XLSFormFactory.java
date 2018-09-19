@@ -78,6 +78,7 @@ public class XLSFormFactory implements com.github.batkinson.jxlsform.api.XLSForm
                 .forEachOrdered(row -> {
                     row.getCellByHeader("type")
                             .map(com.github.batkinson.jxlsform.api.Cell::getValue)
+                            .filter(v -> !v.trim().isEmpty())
                             .ifPresent(type -> {
                                 switch (type) {
                                     case "begin group":
