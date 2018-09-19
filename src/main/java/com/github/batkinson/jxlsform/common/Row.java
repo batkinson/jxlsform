@@ -52,11 +52,11 @@ public class Row implements com.github.batkinson.jxlsform.api.Row {
 
     @Override
     public Optional<com.github.batkinson.jxlsform.api.Cell> getCellByHeader(String name) {
-        return getCell(getSheet()
+        return getSheet()
                 .getHeader()
                 .getCellByHeader(name)
-                .orElseThrow(() -> new XLSFormException("cell for header " + name + " not found"))
-                .getCol());
+                .map(com.github.batkinson.jxlsform.api.Cell::getCol)
+                .flatMap(this::getCell);
     }
 
     @Override
