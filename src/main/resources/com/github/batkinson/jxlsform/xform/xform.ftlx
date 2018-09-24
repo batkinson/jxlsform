@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <h:html xmlns="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa">
-    <h:head>
-        <h:title>${formTitle}</h:title>
-        <model>
-            <instance>
-                <#list questions as question>
-                <${instanceName} id="${formId}" version="${formVersion}">
-                    <${question.name.get()}/>
-                </${instanceName}>
-                </#list>
-            </instance>
-            <#list questions as question>
-            <bind nodeset="/${instanceName}/${question.name.get()}" type="${question.type}" />
+  <h:head>
+    <h:title>${formTitle}</h:title>
+      <model>
+        <instance>
+          <${instanceName} id="${formId}" version="${formVersion}">
+            <meta>
+                <instanceID />
+            </meta>
+            <#list elements as elem>
+            <${elem.name} />
             </#list>
-        </model>
-    </h:head>
-    <h:body>
-    <#list questions as question>
-        <input ref="/${instanceName}/${question.name.get()}">
-            <label>${question.label.get()}</label>
-        </input>
-    </#list>
-    </h:body>
+          </${instanceName}>
+        </instance>
+        <bind nodeset="/${instanceName}/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:', uuid())" />
+        <#list binds as bind>
+        <bind nodeset="/${instanceName}/${bind.name}" type="${bind.type}" />
+        </#list>
+      </model>
+  </h:head>
+  <h:body>
+  <#list controls as ctl>
+    <input ref="/${instanceName}/${ctl.name}">
+        <label>${ctl.label}</label>
+    </input>
+  </#list>
+  </h:body>
 </h:html>
