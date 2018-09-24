@@ -7,7 +7,7 @@
 
     <groupId>com.github.batkinson</groupId>
     <artifactId>jxlsform</artifactId>
-    <version>0.9-SNAPSHOT</version>
+    <version>0.9</version>
 
     <name>JXLSForm</name>
     <description>
